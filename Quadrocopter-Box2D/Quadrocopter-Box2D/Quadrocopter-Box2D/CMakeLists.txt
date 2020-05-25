@@ -25,4 +25,9 @@ World.cpp
 WorldBase.cpp
 WorldObjectInfo.cpp)
 
-target_link_libraries(Quadrocopte
+target_link_libraries(QuadrocopterBox2DSimulator Box2D)
+
+install(TARGETS QuadrocopterBox2DSimulator
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib/static)
