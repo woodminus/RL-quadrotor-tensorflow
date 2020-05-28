@@ -100,4 +100,20 @@ void Obstacle2D::getPoints (
 	a2 = a * 0.5;
 	b2 = b * 0.5;
 
-	px0 = - a2; py0 = + b
+	px0 = - a2; py0 = + b2;
+	px1 = + a2; py1 = + b2;
+	px2 = + a2; py2 = - b2;
+	px3 = - a2; py3 = - b2;
+	
+	float c = cosf (angle + M_PI_2);
+	float s = sinf (angle + M_PI_2);
+	
+	x0 = px0 * c - py0 * s + x; y0 = px0 * s + py0 * c + y;
+	x1 = px1 * c - py1 * s + x; y1 = px1 * s + py1 * c + y;
+	x2 = px2 * c - py2 * s + x; y2 = px2 * s + py2 * c + y;
+	x3 = px3 * c - py3 * s + x; y3 = px3 * s + py3 * c + y;
+}
+
+bool Obstacle2D::containsPoint (const b2Vec2& point) {
+	return body->GetFixtureList()->TestPoint(point);
+}
