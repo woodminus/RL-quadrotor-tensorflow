@@ -21,4 +21,34 @@ void Quadrocopter1D::createIn (World1D& w) {
 	bodyDef.linearDamping = 0.0f;
 	bodyDef.angularDamping = 0.1f;
 //	bodyDef.fixedRotation = true;
-	body = w.world
+	body = w.world->CreateBody(&bodyDef);
+	b2PolygonShape dynamicBox;
+	dynamicBox.SetAsBox(0.4f, 0.4f);
+	b2FixtureDef fixtureDef;
+	fixtureDef.shape = &dynamicBox;
+	fixtureDef.density = 4.0f; // 0.4 x 0.4 x 4 = 0.64 kg
+	fixtureDef.friction = 0.3f;
+	//filtering collisions between quadrocopters
+	fixtureDef.filter.categoryBits = 0x0002;
+	fixtureDef.filter.maskBits = 0x0004;
+	body->CreateFixture(&fixtureDef);
+	
+	b2PrismaticJointDef lockY;
+	lockY.localAxisA.Set(1, 0);
+	lockY.bodyA = w.worldBody;
+	lockY.bodyB = body;
+	lockY.localAnchorA = w.worldBody->GetLocalPoint(bodyDef.position);
+	lockY.localAnchorB = body->GetLocalPoint(bodyDef.position);
+	w.world->CreateJoint(&lockY);
+}
+
+float Quadrocopter1D::getPosition () {
+	return body->GetPosition().x;
+}
+
+void Quadrocopter1D::setPosition (float pos) {
+	body->SetTransform(b2Vec2(pos, 0), 0);
+}
+
+void Quadrocopter1D::setVelocity (float v) {
+	body->SetLinearVelocity(b2Vec2(v
