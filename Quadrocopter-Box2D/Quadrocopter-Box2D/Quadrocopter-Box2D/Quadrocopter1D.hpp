@@ -32,4 +32,13 @@ public:
 	void step ();
 	
 	void sense (const Obstacle1D& o) {}
-	void 
+	void clearSensors () {}
+
+private:
+
+	float motorPower = 0;
+
+	b2Body* body;
+};
+
+#endif /* Quadrocopter1D_hpp */
