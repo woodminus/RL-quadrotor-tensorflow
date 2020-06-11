@@ -51,4 +51,17 @@ void Quadrocopter1D::setPosition (float pos) {
 }
 
 void Quadrocopter1D::setVelocity (float v) {
-	body->SetLinearVelocity(b2Vec2(v
+	body->SetLinearVelocity(b2Vec2(v, 0));
+}
+
+float Quadrocopter1D::getVelocity () {
+	return body->GetLinearVelocity().x;
+}
+
+void Quadrocopter1D::setMotorPower (float p) {
+	motorPower = p;
+}
+
+void Quadrocopter1D::step () {
+	body->ApplyForce(b2Vec2(motorPower, 0), body->GetWorldCenter(), true);
+}
