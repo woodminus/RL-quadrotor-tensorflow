@@ -91,4 +91,41 @@ void Quadrocopter2D::setCoords (const b2Vec2& pos, float angle) {
 
 	angle = degToRad(angle);
 
-//	body->SetLinearVel
+//	body->SetLinearVelocity(b2Vec2 (0, 0));
+//	motor1->SetLinearVelocity(b2Vec2 (0, 0));
+//	motor2->SetLinearVelocity(b2Vec2 (0, 0));
+
+	body->SetTransform (pos, angle);
+	motor1->SetTransform(body->GetWorldPoint(motor1Def.position), angle);
+	motor2->SetTransform(body->GetWorldPoint(motor2Def.position), angle);
+}
+
+float Quadrocopter2D::getRotation () {
+	return body->GetAngle ();
+}
+
+void Quadrocopter2D::setVelocity (const b2Vec2& v) {
+	body->SetLinearVelocity (v);
+	motor1->SetLinearVelocity(v);
+	motor2->SetLinearVelocity(v);
+}
+
+const b2Vec2& Quadrocopter2D::getVelocity () {
+	return body->GetLinearVelocity ();
+}
+
+void Quadrocopter2D::setAngularVelocity (float w) {
+	body->SetAngularVelocity (w);
+}
+
+float Quadrocopter2D::getAngularVelocity () {
+	return body->GetAngularVelocity ();
+}
+
+void Quadrocopter2D::setMotorPower (float p1, float p2) {
+	motor1Power = p1;
+	motor2Power = p2;
+}
+
+void Quadrocopter2D::setMotor1Power (float p1) {
+	motor1Power = p1
