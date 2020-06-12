@@ -128,4 +128,37 @@ void Quadrocopter2D::setMotorPower (float p1, float p2) {
 }
 
 void Quadrocopter2D::setMotor1Power (float p1) {
-	motor1Power = p1
+	motor1Power = p1;
+}
+
+void Quadrocopter2D::setMotor2Power (float p2) {
+	motor2Power = p2;
+}
+
+void Quadrocopter2D::step () {
+	motor1->ApplyForceToCenter (motor1->GetWorldVector(b2Vec2(0, -motor1Power)), true);
+	motor2->ApplyForceToCenter (motor2->GetWorldVector(b2Vec2(0, -motor2Power)), true);
+}
+
+void Quadrocopter2D::getPartsCoords (
+	b2Vec2& bodyPos,
+	b2Vec2& motor1Pos,
+	b2Vec2& motor2Pos,
+	float& bodyRotation,
+	float& motor1Rotation,
+	float& motor2Rotation
+) const {
+	bodyPos = body->GetPosition ();
+	motor1Pos = motor1->GetPosition ();
+	motor2Pos = motor2->GetPosition ();
+	bodyRotation = radToDeg(body->GetAngle ());
+	motor1Rotation = radToDeg(motor1->GetAngle ());
+	motor2Rotation = radToDeg(motor2->GetAngle ());
+}
+
+void Quadrocopter2D::getState (std::vector<float>& state) {
+//	state.assign(state.size(), 0);
+
+	state [0] = body->GetPosition().x;
+	state [1] = body->GetPosition().y;
+	state [2] = sinf(body->GetAngl
