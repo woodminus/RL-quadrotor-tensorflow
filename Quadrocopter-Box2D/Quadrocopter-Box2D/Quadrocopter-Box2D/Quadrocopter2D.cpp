@@ -60,4 +60,35 @@ void Quadrocopter2D::createIn (World2D& w) {
 	motorFixtureDef.shape = &motorShape;
 	motorFixtureDef.density = 4.0f; // 0.4 x 0.4 x 4 = 0.64 kg
 	motorFixtureDef.friction = 0.3f;
-	//filtering collisions between quadrocopte
+	//filtering collisions between quadrocopters
+	motorFixtureDef.filter.categoryBits = 0x0002;
+	motorFixtureDef.filter.maskBits = 0x0004;
+	
+	motor1->CreateFixture(&motorFixtureDef);
+
+	motorDef.position.Set(0.25f, 0.0f);
+	motor2Def = motorDef;
+	motor2 = w.world->CreateBody(&motorDef);
+	motor2->SetUserData(worldObjectInfo.get());
+	motor2->CreateFixture(&motorFixtureDef);
+
+	b2WeldJointDef motor1Joint;
+	motor1Joint.Initialize(body, motor1, motor1Def.position);
+	motor1Joint.collideConnected = false;
+	w.world->CreateJoint(&motor1Joint);
+
+	b2WeldJointDef motor2Joint;
+	motor2Joint.Initialize(body, motor2, motor2Def.position);
+	motor2Joint.collideConnected = false;
+	w.world->CreateJoint(&motor2Joint);
+}
+
+const b2Vec2& Quadrocopter2D::getPosition () {
+	return body->GetPosition ();
+}
+
+void Quadrocopter2D::setCoords (const b2Vec2& pos, float angle) {
+
+	angle = degToRad(angle);
+
+//	body->SetLinearVel
