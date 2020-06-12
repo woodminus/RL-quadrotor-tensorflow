@@ -161,4 +161,41 @@ void Quadrocopter2D::getState (std::vector<float>& state) {
 
 	state [0] = body->GetPosition().x;
 	state [1] = body->GetPosition().y;
-	state [2] = sinf(body->GetAngl
+	state [2] = sinf(body->GetAngle());
+	state [3] = cosf(body->GetAngle());
+	state [4] = body->GetLinearVelocity().x;
+	state [5] = body->GetLinearVelocity().y;
+	state [6] = body->GetAngularVelocity();
+
+	//next 10 floats are sparse coding of target vector
+//	float targetAngle = atan2f(state[0], state[1]) * 180 / M_PI + 180;
+//	int angleIndex = floorf (targetAngle / 36);
+//	state [angleIndex + 7] = 1;
+
+//	std::cout << state[2] << " " << state[3] << std::endl;
+}
+
+void Quadrocopter2D::getMotorPower (float& p1, float& p2) const {
+	p1 = motor1Power;
+	p2 = motor2Power;
+}
+
+void Quadrocopter2D::getMainCoords (
+	float& posX,
+	float& posY,
+	float& angle
+) const {
+	posX = body->GetPosition ().x;
+	posY = body->GetPosition ().y;
+	angle = body->GetAngle () - M_PI_2;
+}
+
+void Quadrocopter2D::setLinearDamping (float d) {
+	body->SetLinearDamping(d);
+}
+
+void Quadrocopter2D::setAngularDamping (float d) {
+	body->SetAngularDamping(d);
+}
+
+float Quadrocopter2D::getLinearDamp
