@@ -198,4 +198,18 @@ void Quadrocopter2D::setAngularDamping (float d) {
 	body->SetAngularDamping(d);
 }
 
-float Quadrocopter2D::getLinearDamp
+float Quadrocopter2D::getLinearDamping () {
+	return body->GetLinearDamping();
+}
+
+float Quadrocopter2D::getAngularDamping () {
+	return body->GetAngularDamping();
+}
+
+World2D& Quadrocopter2D::getWorld () {
+	return *world;
+}
+
+bool Quadrocopter2D::isPointInsideObstacles (const b2Vec2& point) {
+	return world->isPointInsideObstacles(point);
+}
