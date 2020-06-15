@@ -27,4 +27,47 @@ public:
 
 	const b2Vec2& getPosition ();
 	void setCoords (const b2Vec2& pos, float angle) override;
-	float getRotation 
+	float getRotation ();
+	void setVelocity (const b2Vec2& v) override;
+	const b2Vec2& getVelocity ();
+	void setAngularVelocity (float w) override;
+	float getAngularVelocity ();
+	
+	void setLinearDamping (float d);
+	void setAngularDamping (float d);
+	float getLinearDamping ();
+	float getAngularDamping ();
+	
+	void getPartsCoords (
+		b2Vec2& bodyPos,
+		b2Vec2& motor1Pos,
+		b2Vec2& motor2Pos,
+		float& bodyRotation,
+		float& motor1Rotation,
+		float& motor2Rotation
+	) const override;
+	
+	void getState (std::vector<float>& state);
+	
+	void setMotorPower (float p1, float p2);
+	void setMotor1Power (float p1);
+	void setMotor2Power (float p2);
+	void getMotorPower (float& p1, float& p2) const override;
+	
+	void step ();
+	
+	World2D& getWorld ();
+	bool isPointInsideObstacles (const b2Vec2& point);
+
+protected:
+
+	void getMainCoords (
+		float& posX,
+		float& posY,
+		float& angle
+	) const override;
+
+private:
+
+	float motor1Power = 0.2;
+	float mot
