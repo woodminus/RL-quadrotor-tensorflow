@@ -70,4 +70,18 @@ protected:
 private:
 
 	float motor1Power = 0.2;
-	float mot
+	float motor2Power = 0.2;
+
+	b2BodyDef motor1Def;
+	b2BodyDef motor2Def;
+
+	b2Body* body;
+	b2Body* motor1;
+	b2Body* motor2;
+	
+	World2D* world;
+	std::shared_ptr<WorldObjectInfo> worldObjectInfo;
+	
+};
+
+#endif /* Quadrocopter2D_hpp */
