@@ -65,4 +65,32 @@ bool getLineSegmentsIntersection (
         return false; // No collision
 
     t_numer = s32_x * s02_y - s32_y * s02_x;
-    if ((t_numer <
+    if ((t_numer < 0) == denomPositive)
+        return false; // No collision
+
+    if (((s_numer > denom) == denomPositive) || ((t_numer > denom) == denomPositive))
+        return false; // No collision
+    // Collision detected
+    t = t_numer / denom;
+    i_x = p0_x + (t * s10_x);
+    i_y = p0_y + (t * s10_y);
+
+    return true;
+}
+
+void QuadrocopterModel2DIFace::sense (const ObstacleModel2DIFace& o) {
+	float x0, y0, x1, y1, x2, y2, x3, y3;
+	o.getPoints (x0, y0, x1, y1, x2, y2, x3, y3);
+
+	float posX;
+	float posY;
+	float angle;
+	getMainCoords(posX, posY, angle);
+
+	for (int i=0; i<sensorsCount; i++) {
+		float sx = sensorsLength * sinf (i * 2 * M_PI / sensorsCount - angle + M_PI_2) + posX;
+		float sy = sensorsLength * cosf (i * 2 * M_PI / sensorsCount - angle + M_PI_2) + posY;
+
+		float ix, iy, t;
+		float minT = sensors [i] / sensorsMagnitude;
+		if (getLineSegmentsIntersection(posX, p
