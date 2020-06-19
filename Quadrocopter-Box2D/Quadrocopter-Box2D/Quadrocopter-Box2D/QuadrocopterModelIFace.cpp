@@ -93,4 +93,27 @@ void QuadrocopterModel2DIFace::sense (const ObstacleModel2DIFace& o) {
 
 		float ix, iy, t;
 		float minT = sensors [i] / sensorsMagnitude;
-		if (getLineSegmentsIntersection(posX, p
+		if (getLineSegmentsIntersection(posX, posY, sx, sy, x0, y0, x1, y1, ix, iy, t)) {
+			if (t < minT) minT = t;
+		}
+		if (getLineSegmentsIntersection(posX, posY, sx, sy, x1, y1, x2, y2, ix, iy, t)) {
+			if (t < minT) minT = t;
+		}
+		if (getLineSegmentsIntersection(posX, posY, sx, sy, x2, y2, x3, y3, ix, iy, t)) {
+			if (t < minT) minT = t;
+		}
+		if (getLineSegmentsIntersection(posX, posY, sx, sy, x3, y3, x0, y0, ix, iy, t)) {
+			if (t < minT) minT = t;
+		}
+		sensors [i] = sensorsMagnitude * minT;
+		
+	}
+}
+
+void QuadrocopterModel2DIFace::setTarget (const b2Vec2& pos) {
+	target = pos;
+}
+
+b2Vec2 QuadrocopterModel2DIFace::getTarget () {
+	return target;
+}
