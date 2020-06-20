@@ -46,4 +46,29 @@ SimulationTmpl<WorldType, QuadrocopterType>::SimulationTmpl (int quadrocoptersCo
 }
 
 template <typename WorldType, typename QuadrocopterType>
-SimulationTmpl<WorldType, QuadrocopterType>::SimulationTmpl (int quad
+SimulationTmpl<WorldType, QuadrocopterType>::SimulationTmpl (int quadrocoptersCount, int obstaclesCount) : SimulationTmpl (quadrocoptersCount)
+{
+	for (int i=0; i<obstaclesCount; i++) {
+		world.createObstacle ();
+	}
+}
+
+template <typename WorldType, typename QuadrocopterType>
+void SimulationTmpl<WorldType, QuadrocopterType>::step () {
+	world.step();
+}
+
+template <typename WorldType, typename QuadrocopterType>
+QuadrocopterType& SimulationTmpl<WorldType, QuadrocopterType>::getQuadrocopter (int index) {
+	return world.getQuadrocopters () [index];
+}
+
+template <typename WorldType, typename QuadrocopterType>
+float SimulationTmpl<WorldType, QuadrocopterType>::getQuadrocopterPosition (int index) {
+	return world.getQuadrocopters () [index].getPosition();
+}
+
+typedef SimulationTmpl<World1D, Quadrocopter1D> Simulation;
+typedef SimulationTmpl<World2D, Quadrocopter2D> Simulation2D;
+
+#endif /* Simulation_hpp */
