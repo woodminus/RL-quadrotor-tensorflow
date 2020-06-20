@@ -3,4 +3,47 @@
 //  Quadrocopter-Box2D
 //
 //  Created by anton on 27/04/16.
-//  Copyright
+//  Copyright © 2016 anton. All rights reserved.
+//
+
+#ifndef Simulation_hpp
+#define Simulation_hpp
+
+#include <vector>
+
+#include "World.hpp"
+#include "Quadrocopter1D.hpp"
+#include "Quadrocopter2D.hpp"
+
+template <typename WorldType, typename QuadrocopterType>
+class SimulationTmpl {
+public:
+
+	SimulationTmpl (int quadrocoptersCount);
+	SimulationTmpl (int quadrocoptersCount, int obstaclesCount);
+
+	void step ();
+	
+	WorldType& getWorld () {
+		return world;
+	}
+	
+	QuadrocopterType& getQuadrocopter (int index);
+	float getQuadrocopterPosition (int index);
+	
+private:
+
+	WorldType world;
+	
+};
+
+template <typename WorldType, typename QuadrocopterType>
+SimulationTmpl<WorldType, QuadrocopterType>::SimulationTmpl (int quadrocoptersCount) {
+	world.create();
+	for (int i=0; i<quadrocoptersCount; i++) {
+		world.createQuadrocopter ();
+	}
+}
+
+template <typename WorldType, typename QuadrocopterType>
+SimulationTmpl<WorldType, QuadrocopterType>::SimulationTmpl (int quad
