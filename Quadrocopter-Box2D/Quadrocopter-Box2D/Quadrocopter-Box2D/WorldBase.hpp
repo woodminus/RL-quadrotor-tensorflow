@@ -61,4 +61,30 @@ public:
 protected:
 
 	std::vector<QuadrocopterType> quadrocopters;
-	std::vector<ObstacleType> obsta
+	std::vector<ObstacleType> obstacles;
+
+	CollideListener collideListener;
+
+};
+
+template <typename QuadrocopterType, typename ObstacleType>
+std::vector<QuadrocopterType>& WorldBase<QuadrocopterType, ObstacleType>::getQuadrocopters () {
+	return quadrocopters;
+}
+
+template <typename QuadrocopterType, typename ObstacleType>
+ObstacleType& WorldBase<QuadrocopterType, ObstacleType>::getObstacle (int i) {
+	return obstacles [i];
+}
+
+template <typename QuadrocopterType, typename ObstacleType>
+QuadrocopterType& WorldBase<QuadrocopterType, ObstacleType>::createQuadrocopter () {
+	quadrocopters.emplace_back();
+	quadrocopters.back().setId (quadrocopters.size()-1);
+	return quadrocopters.back ();
+}
+
+template <typename QuadrocopterType, typename ObstacleType>
+ObstacleType& WorldBase<QuadrocopterType, ObstacleType>::createObstacle () {
+	obstacles.emplace_back();
+	obstacles.back().setId (ob
