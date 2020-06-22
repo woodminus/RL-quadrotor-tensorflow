@@ -18,4 +18,47 @@ class WorldBase {
 
 public:
 
-	virtua
+	virtual ~WorldBase () {};
+
+	typedef std::function<void (
+		ObstacleType& obstacle,
+		QuadrocopterType& copter
+	)> CollideListener;
+
+	std::vector<QuadrocopterType>& getQuadrocopters ();
+	QuadrocopterType& getQuadrocopter (int i) { return quadrocopters [i]; }
+	ObstacleType& getObstacle (int i);
+	
+	std::vector<ObstacleType>& getObstacles () {
+		return obstacles;
+	}
+	
+	virtual void step () {
+		for (auto& q : quadrocopters) {
+			q.step();
+		}
+		for (auto& o : obstacles) {
+			o.step();
+		}
+	}
+	
+	virtual void afterStep () {
+		for (auto& q : quadrocopters) {
+			q.clearSensors ();
+			for (auto& o : obstacles) {
+				q.sense (o);
+			}
+		}
+	}
+
+	virtual QuadrocopterType& createQuadrocopter ();
+	virtual ObstacleType& createObstacle ();
+	
+	void setCollideListener (CollideListener listener) {
+		collideListener = listener;
+	}
+
+protected:
+
+	std::vector<QuadrocopterType> quadrocopters;
+	std::vector<ObstacleType> obsta
