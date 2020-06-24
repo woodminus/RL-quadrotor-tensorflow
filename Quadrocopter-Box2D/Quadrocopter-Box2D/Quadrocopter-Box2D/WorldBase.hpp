@@ -87,4 +87,8 @@ QuadrocopterType& WorldBase<QuadrocopterType, ObstacleType>::createQuadrocopter 
 template <typename QuadrocopterType, typename ObstacleType>
 ObstacleType& WorldBase<QuadrocopterType, ObstacleType>::createObstacle () {
 	obstacles.emplace_back();
-	obstacles.back().setId (ob
+	obstacles.back().setId (obstacles.size()-1);
+	return obstacles.back ();
+}
+
+#endif /* WorldBase_hpp */
