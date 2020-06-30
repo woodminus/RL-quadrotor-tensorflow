@@ -32,4 +32,29 @@ add_executable(QuadrocopterSimalator
 #add_library(
 ConsumerProducerSyncronizer.cpp
 Lib.cpp
-ObstacleDiscrete1D.
+ObstacleDiscrete1D.cpp
+ObstacleDiscrete2D.cpp
+PID.cpp
+Quadrocopter2DContActionCtrl.cpp
+Quadrocopter2DContActionPIDCtrl.cpp
+Quadrocopter2DContActionPIDLSTMCtrl.cpp
+Quadrocopter2DContActionLSTMCtrl.cpp
+Quadrocopter2DContActionMLPSeqCtrl.cpp
+Quadrocopter2DCtrl.cpp
+QuadrocopterContActionCtrl.cpp
+QuadrocopterCtrl.cpp
+QuadrocopterDiscrete1D.cpp
+QuadrocopterDiscrete2D.cpp
+QuadrocopterDiscrete2DCtrl.cpp
+QuadrocopterDiscreteCtrl.cpp
+QuadrocopterSimulator.cpp
+WorldDiscrete.cpp
+main.cpp
+)
+
+target_link_libraries(QuadrocopterSimalator QuadrocopterBox2DSimulator Quadrocopter2DBrain ${LINUX_LIBS})
+
+install(TARGETS QuadrocopterSimalator
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib/static)
