@@ -69,4 +69,6 @@ bool ConsumerProducerSyncronizer::isProducerMayProceed (int index) {
 }
 
 void ConsumerProducerSyncronizer::setProducerMayProceed (int index, bool mayProceed) {
-	std::lock_gu
+	std::lock_guard<std::mutex> lock(mtxProducersMayProceed);
+	producersMayProceed [index] = mayProceed;
+}
