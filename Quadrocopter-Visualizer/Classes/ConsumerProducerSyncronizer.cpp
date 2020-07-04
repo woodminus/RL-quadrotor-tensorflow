@@ -39,4 +39,34 @@ void ConsumerProducerSyncronizer::waitProducers () {
 
 void ConsumerProducerSyncronizer::waitConsumer (int index) {
 	std::unique_lock<std::mutex> lock(mtxProducers);
-	whil
+	while (!isProducerMayProceed(index)) {
+		cvProducers.wait(lock);
+	}
+	setProducerMayProceed(index, false);
+}
+
+bool ConsumerProducerSyncronizer::isProducersDone () {
+	std::lock_guard<std::mutex> lock (mtxProducersDone);
+	for (int i=0; i<numOfProducers; i++) {
+		if (!producersDone [i]) return false;
+	}
+	return true;
+}
+
+void ConsumerProducerSyncronizer::setProducersMayProceed () {
+	std::lock_guard<std::mutex> lock(mtxProducersMayProceed);
+	producersMayProceed.assign(numOfProducers, true);
+}
+
+void ConsumerProducerSyncronizer::setProducersNotDone () {
+	std::lock_guard<std::mutex> lock(mtxProducersDone);
+	producersDone.assign(numOfProducers, false);
+}
+
+bool ConsumerProducerSyncronizer::isProducerMayProceed (int index) {
+	std::lock_guard<std::mutex> lock(mtxProducersMayProceed);
+	return producersMayProceed [index];
+}
+
+void ConsumerProducerSyncronizer::setProducerMayProceed (int index, bool mayProceed) {
+	std::lock_gu
