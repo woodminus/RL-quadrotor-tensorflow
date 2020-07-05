@@ -37,3 +37,18 @@ private:
     std::condition_variable cvConsumer;
 
 	std::mutex mtxProducersMayProceed;
+	std::vector<bool> producersMayProceed;
+	std::mutex mtxProducers;
+    std::condition_variable cvProducers;
+
+	std::mutex mtxLastProducerWait;
+
+	bool isProducersDone ();
+	bool isProducerMayProceed (int index);
+	void setProducerMayProceed (int index, bool mayProceed);
+	void setProducersMayProceed ();
+	void setProducersNotDone ();
+
+};
+
+#endif /* ConsumerProducerSyncronizer_hpp */
