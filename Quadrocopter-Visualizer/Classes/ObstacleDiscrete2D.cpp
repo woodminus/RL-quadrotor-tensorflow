@@ -30,4 +30,46 @@ void ObstacleDiscrete2D::reset () {
 	w = 0;//Lib::randFloat(-0.02, 0.02);
 }
 
-bool ObstacleDiscrete2D::isCollidedW
+bool ObstacleDiscrete2D::isCollidedWith (const QuadrocopterDiscrete2D& q) {
+
+	//quadrocopter point in center of rectangle
+	b2Vec2 Q (q.posX - x, q.posY - y);
+	//rotating point of quadrocopter
+	float c = cosf (-angle + M_PI_2);
+	float s = sinf (-angle + M_PI_2);
+	Q = b2Vec2 (Q.x * c - Q.y * s, Q.x * s + Q.y * c);
+	
+	if (
+		Q.x > -a2 && Q.x < a2 &&
+		Q.y > -b2 && Q.y < b2
+	) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void ObstacleDiscrete2D::getPoints (
+	float& x0,
+	float& y0,
+	float& x1,
+	float& y1,
+	float& x2,
+	float& y2,
+	float& x3,
+	float& y3
+) const {
+
+	float px0, py0, px1, py1, px2, py2, px3, py3;
+
+	px0 = - a2; py0 = + b2;
+	px1 = + a2; py1 = + b2;
+	px2 = + a2; py2 = - b2;
+	px3 = - a2; py3 = - b2;
+	
+	float c = cosf (angle + M_PI_2);
+	float s = sinf (angle + M_PI_2);
+	
+	x0 = px0 * c - py0 * s + x; y0 = px0 * s + py0 * c + y;
+	x1 = px1 * c - py1 * s + x; y1 = px1 * s + py1 * c + y;
+	x2 = px2 * c - py2 * s + x; y2 = px2 * s + py2 * c
