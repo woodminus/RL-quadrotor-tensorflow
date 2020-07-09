@@ -72,4 +72,20 @@ void ObstacleDiscrete2D::getPoints (
 	
 	x0 = px0 * c - py0 * s + x; y0 = px0 * s + py0 * c + y;
 	x1 = px1 * c - py1 * s + x; y1 = px1 * s + py1 * c + y;
-	x2 = px2 * c - py2 * s + x; y2 = px2 * s + py2 * c
+	x2 = px2 * c - py2 * s + x; y2 = px2 * s + py2 * c + y;
+	x3 = px3 * c - py3 * s + x; y3 = px3 * s + py3 * c + y;
+}
+
+void ObstacleDiscrete2D::getCoords (
+	float& centerX,
+	float& centerY,
+	float& a,
+	float& b,
+	float& angle
+) const {
+	centerX = x;
+	centerY = y;
+	a = this->a;
+	b = this->b;
+	angle = (this->angle + M_PI_2) * 180 / M_PI;
+}
