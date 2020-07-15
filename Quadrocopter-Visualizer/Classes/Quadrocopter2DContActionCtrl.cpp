@@ -45,4 +45,23 @@ void Quadrocopter2DContActionCtrl::act () {
 
 //if (id == 14) CCLOG ("--- action: %f %f %f %f", prevState [8], prevState [9], actionCont [0], actionCont [1]);
 	float p1 = fmin(15, fabs(actionCont [0]));
-	float p2 = fmin(15, fabs(actionCont [1
+	float p2 = fmin(15, fabs(actionCont [1]));
+//	p1 = p1>0?p1:0;
+//	p2 = p2>0?p2:0;
+	simulationModel.setMotorPower(p1, p2);
+
+	reseted = false;
+}
+
+void Quadrocopter2DContActionCtrl::storeExperience () {
+
+	if (reseted) {
+		return;
+	}
+	
+	readState(nextState);
+	
+	calcReward();
+	
+	Quadrocopter2DBrain::storeQuadrocopterExperienceCont(id, reward, actionCont, prevState, nextState);
+}
