@@ -18,4 +18,15 @@ public:
 	
 	void act () override;
 	void calcReward () override;
-	vo
+	void storeExperience () override;
+	void reset () override;
+	void resetAction () override;
+	
+protected:
+
+	std::vector<float> actionCont;
+	
+	
+};
+
+#endif /* Quadrocopter2DContActionLSTMCtrl_hpp */
