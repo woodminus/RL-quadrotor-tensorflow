@@ -76,4 +76,6 @@ void Quadrocopter2DContActionMLPSeqCtrl::reset () {
 void Quadrocopter2DContActionMLPSeqCtrl::resetAction () {
 	Quadrocopter2DCtrl::resetAction();
 	readState(prevState);
-	actionCont.assig
+	actionCont.assign(2, 0);
+	Quadrocopter2DBrain::resetQuadrocopterMLPSeq (id, prevState);
+}
