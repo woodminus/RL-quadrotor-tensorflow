@@ -28,4 +28,4 @@ protected:
 	
 };
 
-#endif /* Quadr
+#endif /* Quadrocopter2DContActionLSTMWeakCtrl_hpp */
