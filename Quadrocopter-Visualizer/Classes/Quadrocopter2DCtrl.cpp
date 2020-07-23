@@ -140,3 +140,94 @@ void Quadrocopter2DCtrl::act () {
 		break;
 		
 		case 5:
+			simulationModel.setMotor1Power(12);
+			simulationModel.setMotor2Power(14);
+		break;
+		
+		case 6:
+			simulationModel.setMotor1Power(12);
+			simulationModel.setMotor2Power(12);
+		break;
+		
+		case 7:
+			simulationModel.setMotor1Power(0);
+			simulationModel.setMotor2Power(0);
+		break;
+		
+		case 8:
+		break;
+	}
+	
+//	time += 0.01;
+//	if (time >= 10) time = 1;
+
+	reseted = false;
+}
+
+void Quadrocopter2DCtrl::storeExperience () {
+
+	if (reseted) {
+		return;
+	}
+	
+	readState(nextState);
+	
+	calcReward();
+	
+	Quadrocopter2DBrain::storeQuadrocopterExperience(id, reward, action, prevState, nextState);
+}
+
+void Quadrocopter2DCtrl::reset () {
+//if (id == 0)
+//std::cout << "--- reset" << std::endl;
+	reseted = true;
+	action = -1;
+//	time = 1;
+
+	while (true) {
+		b2Vec2 p (Lib::randFloat(-100, 100), Lib::randFloat(-100, 100));
+		if (!simulationModel.isPointInsideObstacles(p)) {
+			simulationModel.setCoords(p, Lib::randFloat(0, 360));
+			break;
+		}
+	}
+
+	simulationModel.setVelocity(b2Vec2(Lib::randFloat(-10, 10), Lib::randFloat(-10, 10)));
+	simulationModel.setAngularVelocity(0);
+}
+
+double Quadrocopter2DCtrl::getReward () {
+	return reward;
+}
+
+QuadrocopterModel2DIFace& Quadrocopter2DCtrl::getModel () {
+	return simulationModel;
+}
+
+void Quadrocopter2DCtrl::resetAction () {
+//if (id == 0)
+//std::cout << "--- reset action" << std::endl;
+	reseted = true;
+	action = -1;
+}
+
+void Quadrocopter2DCtrl::onTrainStep (int trainStepIndex) {
+//	if (id != 0) return;
+//	if (trainStepIndex % 50 == 0) {
+//	
+//		gravity += 0.0002;
+//		if (gravity > 5) gravity = 5;
+//		simulationModel.getWorld().world->SetGravity(b2Vec2(0, gravity));
+//		std::cout << "--- gravity: " << gravity << std::endl;
+//	
+////		linearDamping -= 0.00002;
+////		angularDamping -= 0.00002;
+////		rewardWeight -= 0.00004;
+////		if (linearDamping < 0) linearDamping = 0;
+////		if (angularDamping < 0.1) angularDamping = 0.1;
+////		if (rewardWeight < 0.2) rewardWeight = 0.2;
+////		simulationModel.setLinearDamping(linearDamping);
+////		simulationModel.setAngularDamping(angularDamping);
+////if (id == 0) std::cout << "--- model damping: " << linearDamping << " " << angularDamping << " " << rewardWeight << std::endl;
+//	}
+}
