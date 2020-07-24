@@ -36,4 +36,16 @@ protected:
 	double time;
 	double reward;
 //	double sumReward = 0;
-	std::vector<float
+	std::vector<float> prevState;
+	std::vector<float> nextState;
+	
+	double rewardWeight = 0.2;
+	double linearDamping = 0.0;
+	double angularDamping = 0.1;
+	float gravity = 0;
+
+	void readState (std::vector<float>& state);
+
+};
+
+#endif /* Quadrocopter2DCtrl_hpp */
