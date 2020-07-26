@@ -46,4 +46,13 @@ public:
 protected:
 
 	void getMainCoords (
-		fl
+		float& posX,
+		float& posY,
+		float& angle
+	) const override;
+
+private:
+
+};
+
+#endif /* QuadrocopterDiscrete2D_hpp */
