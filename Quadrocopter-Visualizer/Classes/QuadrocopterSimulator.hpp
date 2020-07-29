@@ -89,3 +89,255 @@ private:
 	std::thread qcopterMainWorkerThread;
 	std::vector<std::thread> qcopterWorkersThreads;
 	std::vector<std::thread> trainWorkerThreads;
+
+	ConsumerProducerSyncronizer qcopterActSync;
+
+	
+	std::function<void ()> simulationUpdateCallback;
+	typename WorldType::CollideListener collideListener;
+	
+	const bool useOnlineTrain = false;
+	//const bool useOnlineTrain = true;
+
+};
+
+template <
+	typename WorldType,
+	typename QuadrocopterCtrlType,
+	typename QuadrocopterType,
+	typename ObstacleType
+	>
+QuadrocopterSimulatorTmpl<WorldType, QuadrocopterCtrlType, QuadrocopterType, ObstacleType>::QuadrocopterSimulatorTmpl () :
+	simulation(quadrocoptersCount, obstaclesCount),
+	stepIndex(0),
+	simulationUpdateCallback([](){}),
+	allowThreadsWork(true),
+	qcopterActSync(quadrocoptersWorkerThreads)
+	{}
+
+template <
+	typename WorldType,
+	typename QuadrocopterCtrlType,
+	typename QuadrocopterType,
+	typename ObstacleType
+	>
+void QuadrocopterSimulatorTmpl<WorldType, QuadrocopterCtrlType, QuadrocopterType, ObstacleType>::init()
+{
+
+	Quadrocopter2DBrain::initApiDiscreteDeepQ ();
+	
+	for (int i=0; i<quadrocoptersCount; i++) {
+		qcopterCtrls.emplace_back(i, simulation.getQuadrocopter(i));
+	}
+
+	reset ();
+
+	int qcoptersLeft = quadrocoptersCount;
+	int qcoptersPerThread = quadrocoptersCount / quadrocoptersWorkerThreads;
+	int beginIndex = 0;
+	for (int i=0; i<quadrocoptersWorkerThreads; i++) {
+
+		int endIndex;
+		if (i == quadrocoptersWorkerThreads-1) {
+			endIndex = beginIndex + qcoptersLeft;
+		} else {
+			endIndex = beginIndex + qcoptersPerThread;
+		}
+		
+		int workerIndex = i;
+		qcopterWorkers.push_back([this, beginIndex, endIndex, workerIndex] () {
+			while (allowThreadsWork) {
+
+				for (int i=beginIndex; i<endIndex; i++) {
+					QuadrocopterCtrlType& q = qcopterCtrls [i];
+					q.storeExperience();
+					q.act();
+//					mtxBox2DQCopterWorkers.lock();
+//					q.onSimulationStep (stepIndex);
+//					mtxBox2DQCopterWorkers.unlock();
+				}
+
+				qcopterActSync.reportProducerDone(workerIndex);
+				qcopterActSync.waitConsumer(workerIndex);
+			}
+		});
+		
+		beginIndex += qcoptersPerThread;
+		qcoptersLeft -= qcoptersPerThread;
+	}
+	
+	qcopterMainWorker = [this] () {
+
+        while (allowThreadsWork) {
+			qcopterActSync.waitProducers();
+
+			if (useOnlineTrain && stepIndex > 0) {
+				if (Quadrocopter2DBrain::quadrocopterBrainTrain()) {
+					for (auto& q : qcopterCtrls) {
+						q.onTrainStep (trainStepIndex);
+					}
+					trainStepIndex++;
+				}
+			}
+			
+			for (auto& q : qcopterCtrls) {
+				q.onSimulationStep (stepIndex);
+			}
+
+			if (stepIndex>0)
+			if (stepIndex % exerciseLengthInSteps == 0) {
+				reset ();
+			}
+
+//			if (Lib::randFloat(0, 100) < 1) {
+//				qcopterCtrls [Lib::randInt(0, quadrocoptersCount-1)].reset ();
+//			}
+
+//			if (stepIndex % 2 == 0) {
+//				std::vector<float> state;
+//				if (Quadrocopter2DBrain::getBigErrorExp(state)) {
+//					qcopterCtrls [Lib::randInt(0, 10)].setState (state);
+//				}
+//			}
+
+			std::lock_guard<std::mutex> lock (mtxChangeQCopterParams);
+			simulation.step();
+			simulationUpdateCallback ();
+			stepIndex++;
+			
+//			for (auto& q : qcopterCtrls) {
+//				q.onSimulationStep (stepIndex);
+//			}
+
+			qcopterActSync.reportConsumerDone();
+        }
+	};
+	
+	trainWorker = [this] () {
+		while (allowThreadsWork) {
+			if (Quadrocopter2DBrain::quadrocopterBrainTrain()) {
+				std::lock_guard<std::mutex> lock (mtxChangeQCopterParams);
+				for (auto& q : qcopterCtrls) {
+					q.onTrainStep (trainStepIndex);
+				}
+				trainStepIndex++;
+			}
+		}
+	};
+	
+	simulation.getWorld ().setCollideListener ([this](ObstacleType& o, QuadrocopterType& q){
+		if (collideListener) collideListener (o ,q);
+	});
+}
+
+template <
+	typename WorldType,
+	typename QuadrocopterCtrlType,
+	typename QuadrocopterType,
+	typename ObstacleType
+	>
+void QuadrocopterSimulatorTmpl<WorldType, QuadrocopterCtrlType, QuadrocopterType, ObstacleType>::startActWorkers () {
+	qcopterMainWorkerThread = std::thread (qcopterMainWorker);
+	for (auto& worker : qcopterWorkers) {
+		qcopterWorkersThreads.emplace_back(worker);
+	}
+}
+
+template <
+	typename WorldType,
+	typename QuadrocopterCtrlType,
+	typename QuadrocopterType,
+	typename ObstacleType
+	>
+void QuadrocopterSimulatorTmpl<WorldType, QuadrocopterCtrlType, QuadrocopterType, ObstacleType>::startTrainWorkers () {
+	
+	//train will be executed in qcopterMainWorker
+	//when online training is used
+	if (useOnlineTrain) return;
+	
+	for (int i=0; i<quadrocoptersTrainWorkerThreads; i++) {
+		trainWorkerThreads.emplace_back(trainWorker);
+	}
+}
+
+template <
+	typename WorldType,
+	typename QuadrocopterCtrlType,
+	typename QuadrocopterType,
+	typename ObstacleType
+	>
+void QuadrocopterSimulatorTmpl<WorldType, QuadrocopterCtrlType, QuadrocopterType, ObstacleType>::stop () {
+	allowThreadsWork = false;
+	for (auto& t : qcopterWorkersThreads) {
+		t.join ();
+	}
+	for (auto& t : trainWorkerThreads) {
+		t.join ();
+	}
+	qcopterMainWorkerThread.join();
+	
+	qcopterWorkersThreads.clear();
+	trainWorkerThreads.clear();
+}
+
+template <
+	typename WorldType,
+	typename QuadrocopterCtrlType,
+	typename QuadrocopterType,
+	typename ObstacleType
+	>
+void QuadrocopterSimulatorTmpl<WorldType, QuadrocopterCtrlType, QuadrocopterType, ObstacleType>::join () {
+	qcopterMainWorkerThread.join();
+}
+
+template <
+	typename WorldType,
+	typename QuadrocopterCtrlType,
+	typename QuadrocopterType,
+	typename ObstacleType
+	>
+void QuadrocopterSimulatorTmpl<WorldType, QuadrocopterCtrlType, QuadrocopterType, ObstacleType>::reset () {
+	for (auto& o : simulation.getWorld().getObstacles()) {
+		o.reset ();
+	}
+	for (auto& qCtrl : qcopterCtrls) {
+		qCtrl.reset();
+	}
+}
+
+template <
+	typename WorldType,
+	typename QuadrocopterCtrlType,
+	typename QuadrocopterType,
+	typename ObstacleType
+	>
+QuadrocopterCtrlType& QuadrocopterSimulatorTmpl<WorldType, QuadrocopterCtrlType, QuadrocopterType, ObstacleType>::getQuadrocopterCtrl (int index) {
+	return qcopterCtrls [index];
+}
+
+template <
+	typename WorldType,
+	typename QuadrocopterCtrlType,
+	typename QuadrocopterType,
+	typename ObstacleType
+	>
+void QuadrocopterSimulatorTmpl<WorldType, QuadrocopterCtrlType, QuadrocopterType, ObstacleType>::setSimulationUpdateCallback (std::function<void ()> callback) {
+	simulationUpdateCallback = callback;
+}
+
+
+typedef QuadrocopterSimulatorTmpl<World1D, QuadrocopterCtrl, Quadrocopter1D, Obstacle1D> QuadrocopterSimulator;
+typedef QuadrocopterSimulatorTmpl<WorldDiscrete1D, QuadrocopterDiscreteCtrl, QuadrocopterDiscrete, ObstacleDiscrete1D> QuadrocopterSimulatorDiscrete;
+
+typedef QuadrocopterSimulatorTmpl<World2D, Quadrocopter2DCtrl, Quadrocopter2D, Obstacle2D> QuadrocopterSimulator2D;
+typedef QuadrocopterSimulatorTmpl<WorldDiscrete2D, QuadrocopterDiscrete2DCtrl, QuadrocopterDiscrete2D, ObstacleDiscrete2D> QuadrocopterSimulatorDiscrete2D;
+
+typedef QuadrocopterSimulatorTmpl<World1D, QuadrocopterContActionCtrl, Quadrocopter1D, Obstacle1D> QuadrocopterSimulatorCont1D;
+typedef QuadrocopterSimulatorTmpl<World2D, Quadrocopter2DContActionCtrl, Quadrocopter2D, Obstacle2D> QuadrocopterSimulatorCont2D;
+typedef QuadrocopterSimulatorTmpl<World2D, Quadrocopter2DContActionLSTMWeakCtrl, Quadrocopter2D, Obstacle2D> QuadrocopterSimulatorContLSTMWeak2D;
+typedef QuadrocopterSimulatorTmpl<World2D, Quadrocopter2DContActionPIDCtrl, Quadrocopter2D, Obstacle2D> QuadrocopterSimulatorContPID2D;
+typedef QuadrocopterSimulatorTmpl<World2D, Quadrocopter2DContActionPIDLSTMCtrl, Quadrocopter2D, Obstacle2D> QuadrocopterSimulatorContPIDLSTM2D;
+typedef QuadrocopterSimulatorTmpl<World2D, Quadrocopter2DContActionMLPSeqCtrl, Quadrocopter2D, Obstacle2D> QuadrocopterSimulatorContMLPSeq2D;
+typedef QuadrocopterSimulatorTmpl<World2D, Quadrocopter2DContActionLSTMCtrl, Quadrocopter2D, Obstacle2D> QuadrocopterSimulatorContLSTM2D;
+
+#endif /* QuadrocopterSimulator_hpp */
