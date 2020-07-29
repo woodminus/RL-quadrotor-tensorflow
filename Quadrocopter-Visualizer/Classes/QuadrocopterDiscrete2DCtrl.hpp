@@ -24,4 +24,27 @@ public:
 	void reset ();
 	void resetAction ();
 	double getReward ();
-	void setState (const std:
+	void setState (const std::vector<float> state);
+	QuadrocopterModel2DIFace& getModel ();
+	void onTrainStep (int trainStepIndex) {}
+	void onSimulationStep (int stepIndex);
+
+private:
+
+	int id;
+	long action = -1;
+//	int timeReward = 0;
+	double reward;
+//	double sumReward = 0;
+	std::vector<float> prevState;
+	std::vector<float> nextState;
+	
+	QuadrocopterDiscrete2D& model;
+	
+	void readState (std::vector<float>& state);
+
+//	Quadrocopter2D& simulationModel;
+
+};
+
+#endif /* QuadrocopterDiscrete2DCtrl_hpp */
