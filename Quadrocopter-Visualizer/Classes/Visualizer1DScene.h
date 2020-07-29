@@ -24,4 +24,13 @@ public:
 
     virtual bool init() override;
 
-    virtual void update(float delta) ov
+    virtual void update(float delta) override;
+	
+    // a selector callback
+    void menuCloseCallback(cocos2d::Ref* pSender);
+    
+    // implement the "static create()" method manually
+    CREATE_FUNC(Visualizer1DScene);
+};
+
+#endif // __Visualizer1DScene_H__
