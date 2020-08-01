@@ -57,4 +57,38 @@ public:
 //	QuadrocopterSimulatorContLSTMWeak2D sim;
 //	QuadrocopterSimulatorContPID2D sim;
 //	QuadrocopterSimulatorContPIDLSTM2D sim;
-//	QuadrocopterSimulatorContMLP
+//	QuadrocopterSimulatorContMLPSeq2D sim;
+//	QuadrocopterSimulatorContLSTM2D sim;
+
+	int simulationStep;
+	
+	std::vector<Quadrocopter2DView> qcopterViews;
+	std::vector<Obstacle2DView> obstacleViews;
+	cocos2d::Vec2 centerPos;
+
+	const int debugPointsX = 50;
+	const int debugPointsY = 50;
+	std::vector<cocos2d::LayerColor*> debugPoints;
+
+	cocos2d::LayerColor* targetNode1;
+	cocos2d::LayerColor* targetNode2;
+
+	Visualizer2DScene ();
+	
+	void reset ();
+	void changeTarget ();
+
+    static cocos2d::Scene* createScene();
+
+    virtual bool init() override;
+
+    virtual void update(float delta) override;
+	
+    // a selector callback
+    void menuCloseCallback(cocos2d::Ref* pSender);
+    
+    // implement the "static create()" method manually
+    CREATE_FUNC(Visualizer2DScene);
+};
+
+#endif /* Visualizer2DScene_hpp */
