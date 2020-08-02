@@ -37,4 +37,26 @@ private:
 };
 
 
-template <typename QuadrocopterType,
+template <typename QuadrocopterType, typename ObstacleType>
+void WorldDiscrete<QuadrocopterType, ObstacleType>::create () {}
+
+template <typename QuadrocopterType, typename ObstacleType>
+void WorldDiscrete<QuadrocopterType, ObstacleType>::step () {
+	WorldBase<QuadrocopterType, ObstacleType>::step ();
+	for (auto& q : WorldBase<QuadrocopterType, ObstacleType>::quadrocopters) {
+		q.setCollided (false);
+		q.clearSensors ();
+		for (auto& o : WorldBase<QuadrocopterType, ObstacleType>::obstacles) {
+			q.sense (o);
+			if (o.isCollidedWith (q)) {
+				q.setCollided (true);
+				if (WorldBase<QuadrocopterType, ObstacleType>::collideListener) {
+					WorldBase<QuadrocopterType, ObstacleType>::collideListener (o, q);
+				}
+				break;
+			}
+		}
+	}
+}
+
+#endif /* WorldDiscrete_hpp */
