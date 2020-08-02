@@ -9,4 +9,17 @@
 #include <iostream>
 
 #include "main.h"
-#include "Quadr
+#include "QuadrocopterSimulator.hpp"
+
+QuadrocopterSimulatorContMLPSeq2D sim;
+
+int main(int argc, const char * argv[]) {
+
+	sim.init();
+	sim.startActWorkers();
+	sim.startTrainWorkers();
+	sim.join();
+	
+	std::cout << "execution ended\n";
+    return 0;
+}
