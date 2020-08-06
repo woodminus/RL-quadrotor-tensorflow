@@ -15,4 +15,9 @@
 <mapEntry key="org.eclipse.cdt.make.core.enableAutoBuild" value="false"/>
 <mapEntry key="org.eclipse.cdt.make.core.enableCleanBuild" value="true"/>
 <mapEntry key="org.eclipse.cdt.make.core.enableFullBuild" value="true"/>
-<mapEntry key="org.eclipse.cdt.make.core.fullBu
+<mapEntry key="org.eclipse.cdt.make.core.fullBuildTarget" value="all"/>
+<mapEntry key="org.eclipse.cdt.make.core.stopOnError" value="true"/>
+<mapEntry key="org.eclipse.cdt.make.core.useDefaultBuildCmd" value="false"/>
+</mapAttribute>
+<booleanAttribute key="org.eclipse.ui.externaltools.ATTR_TRIGGERS_CONFIGURED" value="true"/>
+</launchConfiguration>
