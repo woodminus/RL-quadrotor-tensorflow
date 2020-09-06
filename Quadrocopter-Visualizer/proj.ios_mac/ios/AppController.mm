@@ -16,4 +16,32 @@
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABL
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ ****************************************************************************/
+
+#import "AppController.h"
+#import "platform/ios/CCEAGLView-ios.h"
+#import "cocos2d.h"
+#import "AppDelegate.h"
+#import "RootViewController.h"
+
+@implementation AppController
+
+#pragma mark -
+#pragma mark Application lifecycle
+
+// cocos2d application instance
+static AppDelegate s_sharedApplication;
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
+
+    cocos2d::Application *app = cocos2d::Application::getInstance();
+    app->initGLContextAttrs();
+    cocos2d::GLViewImpl::convertAttrs();
+
+    // Override point for customization after application launch.
+
+    // Add the view controlle
