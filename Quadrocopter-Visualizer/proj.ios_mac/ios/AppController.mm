@@ -44,4 +44,22 @@ static AppDelegate s_sharedApplication;
 
     // Override point for customization after application launch.
 
-    // Add the view controlle
+    // Add the view controller's view to the window and display.
+    window = [[UIWindow alloc] initWithFrame: [[UIScreen mainScreen] bounds]];
+
+    // Init the CCEAGLView
+    CCEAGLView *eaglView = [CCEAGLView viewWithFrame: [window bounds]
+                                         pixelFormat: (NSString*)cocos2d::GLViewImpl::_pixelFormat
+                                         depthFormat: cocos2d::GLViewImpl::_depthFormat
+                                  preserveBackbuffer: NO
+                                          sharegroup: nil
+                                       multiSampling: NO
+                                     numberOfSamples: 0 ];
+    
+    // Enable or disable multiple touches
+    [eaglView setMultipleTouchEnabled:NO];
+
+    // Use RootViewController manage CCEAGLView 
+    _viewController = [[RootViewController alloc] initWithNibName:nil bundle:nil];
+    _viewController.wantsFullScreenLayout = YES;
+  
