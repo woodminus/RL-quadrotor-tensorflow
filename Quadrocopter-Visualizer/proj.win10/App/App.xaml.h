@@ -10,4 +10,13 @@ namespace CocosAppWinRT
     {
     public:
         App();
-        vi
+        virtual void OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEventArgs^ e) override;
+
+    private:
+        void OnSuspending(Platform::Object^ sender, Windows::ApplicationModel::SuspendingEventArgs^ e);
+        void OnResuming(Platform::Object ^sender, Platform::Object ^args);
+
+        OpenGLESPage^ mPage;
+        OpenGLES mOpenGLES;
+    };
+}
