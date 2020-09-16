@@ -18,4 +18,11 @@
                             <ColumnDefinition Width="120" />
                         </Grid.ColumnDefinitions>
 
-                        <Button x:Name="cocos2d_editbox_done" Grid.Column="1" VerticalAlignment
+                        <Button x:Name="cocos2d_editbox_done" Grid.Column="1" VerticalAlignment="Center">Done</Button>
+                        <Button x:Name="cocos2d_editbox_cancel" Grid.Column="2" VerticalAlignment="Center">Cancel</Button>
+                    </Grid>
+                </Flyout>
+            </Button.Flyout>
+        </Button>
+    </SwapChainPanel>
+</Page>
