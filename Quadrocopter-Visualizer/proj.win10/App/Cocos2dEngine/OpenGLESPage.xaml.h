@@ -54,4 +54,22 @@ namespace CocosAppWinRT
         void StopRenderLoop();
 
         OpenGLES* mOpenGLES;
-        std
+        std::shared_ptr<Cocos2dRenderer> mRenderer;
+
+        Windows::Foundation::Size mSwapChainPanelSize;
+        Concurrency::critical_section mSwapChainPanelSizeCriticalSection;
+
+        Windows::Foundation::Size mCustomRenderSurfaceSize;
+        bool mUseCustomRenderSurfaceSize;
+
+        EGLSurface mRenderSurface;     // This surface is associated with a swapChainPanel on the page
+        Concurrency::critical_section mRenderSurfaceCriticalSection;
+        Windows::Foundation::IAsyncAction^ mRenderLoopWorker;
+
+        // Track user input on a background worker thread.
+        Windows::Foundation::IAsyncAction^ mInputLoopWorker;
+        Windows::UI::Core::CoreIndependentInputSource^ mCoreInput;
+
+        // Independent input handling functions.
+        void OnPointerPressed(Platform::Object^ sender, Windows::UI::Core::PointerEventArgs^ e);
+        void OnPointerMoved(Platform::Object^ sender, Win
