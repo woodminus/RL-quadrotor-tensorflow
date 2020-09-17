@@ -72,4 +72,20 @@ namespace CocosAppWinRT
 
         // Independent input handling functions.
         void OnPointerPressed(Platform::Object^ sender, Windows::UI::Core::PointerEventArgs^ e);
-        void OnPointerMoved(Platform::Object^ sender, Win
+        void OnPointerMoved(Platform::Object^ sender, Windows::UI::Core::PointerEventArgs^ e);
+        void OnPointerReleased(Platform::Object^ sender, Windows::UI::Core::PointerEventArgs^ e);
+		void OnKeyPressed(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::KeyEventArgs^ args);
+		void OnKeyReleased(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::KeyEventArgs^ args);
+		void OnCharacterReceived(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::CharacterReceivedEventArgs^ args);
+
+        void OnOrientationChanged(Windows::Graphics::Display::DisplayInformation^ sender, Platform::Object^ args);
+
+        float mDpi;
+        bool mDeviceLost;
+        bool mVisible;
+        Windows::Graphics::Display::DisplayOrientations mOrientation;
+
+        std::mutex mSleepMutex;
+        std::condition_variable mSleepCondition;
+    };
+}
