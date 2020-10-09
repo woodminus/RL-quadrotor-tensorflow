@@ -1,4 +1,8 @@
 {
     "copy_resources": [
         {
-            "from": "../Resource
+            "from": "../Resources",
+            "to": ""
+        }
+    ]
+}
