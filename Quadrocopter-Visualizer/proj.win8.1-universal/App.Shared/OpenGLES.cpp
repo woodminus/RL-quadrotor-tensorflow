@@ -22,4 +22,42 @@ using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::Foundation;
 using namespace Windows::Foundation::Collections;
 
-OpenGLES::OpenGLES(
+OpenGLES::OpenGLES() :
+    mEglConfig(nullptr),
+    mEglDisplay(EGL_NO_DISPLAY),
+    mEglContext(EGL_NO_CONTEXT)
+{
+    Initialize();
+}
+
+OpenGLES::~OpenGLES()
+{
+    Cleanup();
+}
+
+void OpenGLES::Initialize()
+{
+    const EGLint configAttributes[] = 
+    {
+        EGL_RED_SIZE, 8,
+        EGL_GREEN_SIZE, 8,
+        EGL_BLUE_SIZE, 8,
+        EGL_ALPHA_SIZE, 8,
+        EGL_DEPTH_SIZE, 8,
+        EGL_STENCIL_SIZE, 8,
+        EGL_NONE
+    };
+
+    const EGLint contextAttributes[] = 
+    { 
+        EGL_CONTEXT_CLIENT_VERSION, 2, 
+        EGL_NONE
+    };
+
+    const EGLint defaultDisplayAttributes[] =
+    {
+        // These are the default display attributes, used to request ANGLE's D3D11 renderer.
+        // eglInitialize will only succeed with these attributes if the hardware supports D3D11 Feature Level 10_0+.
+        EGL_PLATFORM_ANGLE_TYPE_ANGLE, EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE,
+
+        // EGL_ANGLE_DISPLAY_ALLOW_RENDER_
