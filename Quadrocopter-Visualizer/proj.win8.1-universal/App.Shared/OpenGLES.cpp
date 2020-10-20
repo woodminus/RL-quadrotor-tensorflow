@@ -74,4 +74,20 @@ void OpenGLES::Initialize()
     const EGLint fl9_3DisplayAttributes[] =
     {
         // These can be used to request ANGLE's D3D11 renderer, with D3D11 Feature Level 9_3.
- 
+        // These attributes are used if the call to eglInitialize fails with the default display attributes.
+        EGL_PLATFORM_ANGLE_TYPE_ANGLE, EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE,
+        EGL_PLATFORM_ANGLE_MAX_VERSION_MAJOR_ANGLE, 9,
+        EGL_PLATFORM_ANGLE_MAX_VERSION_MINOR_ANGLE, 3,
+        EGL_ANGLE_DISPLAY_ALLOW_RENDER_TO_BACK_BUFFER, EGL_TRUE, 
+        EGL_PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE, EGL_TRUE,
+        EGL_NONE,
+    };
+
+    const EGLint warpDisplayAttributes[] =
+    {
+        // These attributes can be used to request D3D11 WARP.
+        // They are used if eglInitialize fails with both the default display attributes and the 9_3 display attributes.
+        EGL_PLATFORM_ANGLE_TYPE_ANGLE, EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE,
+        EGL_PLATFORM_ANGLE_DEVICE_TYPE_ANGLE, EGL_PLATFORM_ANGLE_DEVICE_TYPE_WARP_ANGLE,
+        EGL_ANGLE_DISPLAY_ALLOW_RENDER_TO_BACK_BUFFER, EGL_TRUE, 
+      
