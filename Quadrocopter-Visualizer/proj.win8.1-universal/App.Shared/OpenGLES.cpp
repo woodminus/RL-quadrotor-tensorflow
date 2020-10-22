@@ -116,4 +116,22 @@ void OpenGLES::Initialize()
     //       Windows Phones devices only support D3D11 Feature Level 9_3, but the Windows Phone emulator supports 11_0+.
     //       We use this #ifdef to limit the Phone emulator to Feature Level 9_3, making it behave more like
     //       real Windows Phone devices.
-    //       If you wish to test Feature Level 10_0+ in the Wind
+    //       If you wish to test Feature Level 10_0+ in the Windows Phone emulator then you should remove this #ifdef.
+    //
+    
+#if (WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP)
+    // This tries to initialize EGL to D3D11 Feature Level 10_0+. See above comment for details.
+    mEglDisplay = eglGetPlatformDisplayEXT(EGL_PLATFORM_ANGLE_ANGLE, EGL_DEFAULT_DISPLAY, defaultDisplayAttributes);
+    if (mEglDisplay == EGL_NO_DISPLAY)
+    {
+        throw Exception::CreateException(E_FAIL, L"Failed to get EGL display");
+    }
+
+    if (eglInitialize(mEglDisplay, NULL, NULL) == EGL_FALSE)
+#endif    
+    {
+        // This tries to initialize EGL to D3D11 Feature Level 9_3, if 10_0+ is unavailable (e.g. on Windows Phone, or certain Windows tablets).
+        mEglDisplay = eglGetPlatformDisplayEXT(EGL_PLATFORM_ANGLE_ANGLE, EGL_DEFAULT_DISPLAY, fl9_3DisplayAttributes);
+        if (mEglDisplay == EGL_NO_DISPLAY)
+        {
+            throw Excep
