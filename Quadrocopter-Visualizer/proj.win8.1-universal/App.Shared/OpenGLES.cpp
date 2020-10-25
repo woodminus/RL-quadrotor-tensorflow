@@ -134,4 +134,25 @@ void OpenGLES::Initialize()
         mEglDisplay = eglGetPlatformDisplayEXT(EGL_PLATFORM_ANGLE_ANGLE, EGL_DEFAULT_DISPLAY, fl9_3DisplayAttributes);
         if (mEglDisplay == EGL_NO_DISPLAY)
         {
-            throw Excep
+            throw Exception::CreateException(E_FAIL, L"Failed to get EGL display");
+        }
+
+        if (eglInitialize(mEglDisplay, NULL, NULL) == EGL_FALSE)
+        {
+            // This initializes EGL to D3D11 Feature Level 11_0 on WARP, if 9_3+ is unavailable on the default GPU (e.g. on Surface RT).
+            mEglDisplay = eglGetPlatformDisplayEXT(EGL_PLATFORM_ANGLE_ANGLE, EGL_DEFAULT_DISPLAY, warpDisplayAttributes);
+            if (mEglDisplay == EGL_NO_DISPLAY)
+            {
+                throw Exception::CreateException(E_FAIL, L"Failed to get EGL display");
+            }
+
+            if (eglInitialize(mEglDisplay, NULL, NULL) == EGL_FALSE)
+            {
+                // If all of the calls to eglInitialize returned EGL_FALSE then an error has occurred.
+                throw Exception::CreateException(E_FAIL, L"Failed to initialize EGL");
+            }
+        }
+    }
+
+    EGLint numConfigs = 0;
+    if ((eglCh
