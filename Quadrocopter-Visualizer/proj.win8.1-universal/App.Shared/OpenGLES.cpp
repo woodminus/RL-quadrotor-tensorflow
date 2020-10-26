@@ -188,4 +188,26 @@ void OpenGLES::Reset()
     Initialize();
 }
 
-EGLSurface OpenGLES::CreateSurface(SwapChainPanel^ panel, 
+EGLSurface OpenGLES::CreateSurface(SwapChainPanel^ panel, const Size* renderSurfaceSize)
+{
+    if (!panel)
+    {
+        throw Exception::CreateException(E_INVALIDARG, L"SwapChainPanel parameter is invalid");
+    }
+
+    EGLSurface surface = EGL_NO_SURFACE;
+
+    const EGLint surfaceAttributes[] =
+    {
+        // EGL_ANGLE_SURFACE_RENDER_TO_BACK_BUFFER is part of the same optimization as EGL_ANGLE_DISPLAY_ALLOW_RENDER_TO_BACK_BUFFER (see above).
+        // If you have compilation issues with it then please update your Visual Studio templates.
+        EGL_ANGLE_SURFACE_RENDER_TO_BACK_BUFFER, EGL_TRUE,
+        EGL_NONE
+    };
+    
+    // Create a PropertySet and initialize with the EGLNativeWindowType.
+    PropertySet^ surfaceCreationProperties = ref new PropertySet();
+    surfaceCreationProperties->Insert(ref new String(EGLNativeWindowTypeProperty), panel);
+
+    // If a render surface size is specified, add it to the surface creation properties
+    if (renderSurf
