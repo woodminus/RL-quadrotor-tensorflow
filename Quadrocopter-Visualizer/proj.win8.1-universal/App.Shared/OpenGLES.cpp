@@ -210,4 +210,34 @@ EGLSurface OpenGLES::CreateSurface(SwapChainPanel^ panel, const Size* renderSurf
     surfaceCreationProperties->Insert(ref new String(EGLNativeWindowTypeProperty), panel);
 
     // If a render surface size is specified, add it to the surface creation properties
-    if (renderSurf
+    if (renderSurfaceSize != nullptr)
+    {
+        surfaceCreationProperties->Insert(ref new String(EGLRenderSurfaceSizeProperty), PropertyValue::CreateSize(*renderSurfaceSize));
+    }
+
+    surface = eglCreateWindowSurface(mEglDisplay, mEglConfig, reinterpret_cast<IInspectable*>(surfaceCreationProperties), surfaceAttributes);
+    if (surface == EGL_NO_SURFACE)
+    {
+        throw Exception::CreateException(E_FAIL, L"Failed to create EGL surface");
+    }
+
+    return surface;
+}
+
+void OpenGLES::DestroySurface(const EGLSurface surface)
+{
+    if (mEglDisplay != EGL_NO_DISPLAY && surface != EGL_NO_SURFACE)
+    {
+        eglDestroySurface(mEglDisplay, surface);
+    }
+}
+
+void OpenGLES::MakeCurrent(const EGLSurface surface)
+{
+    if (eglMakeCurrent(mEglDisplay, surface, surface, mEglContext) == EGL_FALSE)
+    {
+        throw Exception::CreateException(E_FAIL, L"Failed to make EGLSurface current");
+    }
+}
+
+EGLBoolean OpenGLES::SwapBuffers
