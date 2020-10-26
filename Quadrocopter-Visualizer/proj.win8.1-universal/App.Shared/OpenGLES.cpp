@@ -155,4 +155,37 @@ void OpenGLES::Initialize()
     }
 
     EGLint numConfigs = 0;
-    if ((eglCh
+    if ((eglChooseConfig(mEglDisplay, configAttributes, &mEglConfig, 1, &numConfigs) == EGL_FALSE) || (numConfigs == 0))
+    {
+        throw Exception::CreateException(E_FAIL, L"Failed to choose first EGLConfig");
+    }
+
+    mEglContext = eglCreateContext(mEglDisplay, mEglConfig, EGL_NO_CONTEXT, contextAttributes);
+    if (mEglContext == EGL_NO_CONTEXT)
+    {
+        throw Exception::CreateException(E_FAIL, L"Failed to create EGL context");
+    }
+}
+
+void OpenGLES::Cleanup()
+{
+    if (mEglDisplay != EGL_NO_DISPLAY && mEglContext != EGL_NO_CONTEXT)
+    {
+        eglDestroyContext(mEglDisplay, mEglContext);
+        mEglContext = EGL_NO_CONTEXT;
+    }
+
+    if (mEglDisplay != EGL_NO_DISPLAY)
+    {
+        eglTerminate(mEglDisplay);
+        mEglDisplay = EGL_NO_DISPLAY;
+    }
+}
+
+void OpenGLES::Reset()
+{
+    Cleanup();
+    Initialize();
+}
+
+EGLSurface OpenGLES::CreateSurface(SwapChainPanel^ panel, 
