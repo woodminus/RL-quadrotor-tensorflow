@@ -346,3 +346,118 @@ void OpenGLESPage::StartRenderLoop()
 
     // Create a task for rendering that will be run on a background thread.
     auto workItemHandler = ref new Windows::System::Threading::WorkItemHandler([this, dispatcher](Windows::Foundation::IAsyncAction ^ action)
+    {
+        mOpenGLES->MakeCurrent(mRenderSurface);
+
+        GLsizei panelWidth = 0;
+        GLsizei panelHeight = 0;
+        GetSwapChainPanelSize(&panelWidth, &panelHeight);
+
+        if (mRenderer.get() == nullptr)
+        {
+            mRenderer = std::make_shared<Cocos2dRenderer>(panelWidth, panelHeight, mDpi, mOrientation, dispatcher, swapChainPanel);
+        }
+
+        mRenderer->Resume();
+
+        while (action->Status == Windows::Foundation::AsyncStatus::Started)
+        {
+            if (!mVisible)
+            {
+                mRenderer->Pause();
+            }
+
+            // wait until app is visible again or thread is cancelled
+            while (!mVisible)
+            {
+                std::unique_lock<std::mutex> lock(mSleepMutex);
+                mSleepCondition.wait(lock);
+
+                if (action->Status != Windows::Foundation::AsyncStatus::Started)
+                {
+                    return; // thread was cancelled. Exit thread
+                }
+
+                if (mVisible)
+                {
+                    mRenderer->Resume();
+                }
+                else // spurious wake up
+                {
+                    continue;
+                }
+            }
+
+            GetSwapChainPanelSize(&panelWidth, &panelHeight);
+            mRenderer.get()->Draw(panelWidth, panelHeight, mDpi, mOrientation);
+
+            if (mRenderer->AppShouldExit())
+            {
+                // run on main UI thread
+                swapChainPanel->Dispatcher->RunAsync(Windows::UI::Core::CoreDispatcherPriority::Normal, ref new DispatchedHandler([this]()
+                {
+                    TerminateApp();
+                }));
+
+                return;
+            }
+
+            EGLBoolean result = GL_FALSE;
+            {
+                critical_section::scoped_lock lock(mRenderSurfaceCriticalSection);
+                result = mOpenGLES->SwapBuffers(mRenderSurface);
+            }
+
+            if (result != GL_TRUE)
+            {
+                // The call to eglSwapBuffers was not be successful (i.e. due to Device Lost)
+                // If the call fails, then we must reinitialize EGL and the GL resources.
+                mRenderer->Pause();
+                mDeviceLost = true;
+
+                // XAML objects like the SwapChainPanel must only be manipulated on the UI thread.
+                swapChainPanel->Dispatcher->RunAsync(Windows::UI::Core::CoreDispatcherPriority::High, ref new Windows::UI::Core::DispatchedHandler([=]()
+                {
+                    RecoverFromLostDevice();
+                }, CallbackContext::Any));
+
+                // wait until OpenGL is reset or thread is cancelled
+                while (mDeviceLost)
+                {
+                    std::unique_lock<std::mutex> lock(mSleepMutex);
+                    mSleepCondition.wait(lock);
+
+                    if (action->Status != Windows::Foundation::AsyncStatus::Started)
+                    {
+                        return; // thread was cancelled. Exit thread
+                    }
+
+                    if (!mDeviceLost)
+                    {
+                        mOpenGLES->MakeCurrent(mRenderSurface);
+                        // restart cocos2d-x 
+                        mRenderer->DeviceLost();
+                    }
+                    else // spurious wake up
+                    {
+                        continue;
+                    }
+                }
+            }
+        }
+    });
+
+    // Run task on a dedicated high priority background thread.
+    mRenderLoopWorker = Windows::System::Threading::ThreadPool::RunAsync(workItemHandler, Windows::System::Threading::WorkItemPriority::High, Windows::System::Threading::WorkItemOptions::TimeSliced);
+}
+
+void OpenGLESPage::StopRenderLoop()
+{
+    if (mRenderLoopWorker)
+    {
+        mRenderLoopWorker->Cancel();
+        std::unique_lock<std::mutex> locker(mSleepMutex);
+        mSleepCondition.notify_one();
+        mRenderLoopWorker = nullptr;
+    }
+}
