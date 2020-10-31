@@ -240,4 +240,7 @@ void OpenGLES::MakeCurrent(const EGLSurface surface)
     }
 }
 
-EGLBoolean OpenGLES::SwapBuffers
+EGLBoolean OpenGLES::SwapBuffers(const EGLSurface surface)
+{
+    return (eglSwapBuffers(mEglDisplay, surface));
+}
