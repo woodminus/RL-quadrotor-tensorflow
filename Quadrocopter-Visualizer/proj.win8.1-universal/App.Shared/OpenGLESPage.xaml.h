@@ -19,4 +19,30 @@
 #pragma once
 
 #include "OpenGLES.h"
-#include "OpenGLESPage
+#include "OpenGLESPage.g.h"
+#include <memory>
+#include <condition_variable>
+#include <mutex>
+
+#include "Cocos2dRenderer.h"
+
+namespace CocosAppWinRT
+{
+    public ref class OpenGLESPage sealed
+    {
+    public:
+        OpenGLESPage();
+        virtual ~OpenGLESPage();
+        void SetVisibility(bool isVisible);
+
+    internal:
+        OpenGLESPage(OpenGLES* openGLES);
+
+    private:
+        void OnPageLoaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+        void OnVisibilityChanged(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::VisibilityChangedEventArgs^ args);
+        void OnSwapChainPanelSizeChanged(Platform::Object^ sender, Windows::UI::Xaml::SizeChangedEventArgs^ e);
+#if (WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP) || _MSC_VER >= 1900
+        void OnBackButtonPressed(Platform::Object^ sender, Windows::Phone::UI::Input::BackPressedEventArgs^ args);
+#endif
+        void GetSwapChainPanelSize(GLsize
