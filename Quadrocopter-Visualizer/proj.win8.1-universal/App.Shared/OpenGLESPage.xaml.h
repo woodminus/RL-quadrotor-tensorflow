@@ -78,4 +78,14 @@ namespace CocosAppWinRT
 		void OnKeyReleased(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::KeyEventArgs^ args);
 		void OnCharacterReceived(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::CharacterReceivedEventArgs^ args);
 
-        void OnOrientationChanged(Windows::Graphics::Display::DisplayInformation^ sende
+        void OnOrientationChanged(Windows::Graphics::Display::DisplayInformation^ sender, Platform::Object^ args);
+
+        float mDpi;
+        bool mDeviceLost;
+        bool mVisible;
+        Windows::Graphics::Display::DisplayOrientations mOrientation;
+
+        std::mutex mSleepMutex;
+        std::condition_variable mSleepCondition;
+    };
+}
