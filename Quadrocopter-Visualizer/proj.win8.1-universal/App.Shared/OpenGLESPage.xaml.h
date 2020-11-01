@@ -45,4 +45,26 @@ namespace CocosAppWinRT
 #if (WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP) || _MSC_VER >= 1900
         void OnBackButtonPressed(Platform::Object^ sender, Windows::Phone::UI::Input::BackPressedEventArgs^ args);
 #endif
-        void GetSwapChainPanelSize(GLsize
+        void GetSwapChainPanelSize(GLsizei* width, GLsizei* height);
+        void CreateRenderSurface();
+        void DestroyRenderSurface();
+        void RecoverFromLostDevice();
+        void TerminateApp();
+        void StartRenderLoop();
+        void StopRenderLoop();
+
+        OpenGLES* mOpenGLES;
+        std::shared_ptr<Cocos2dRenderer> mRenderer;
+
+        Windows::Foundation::Size mSwapChainPanelSize;
+        Concurrency::critical_section mSwapChainPanelSizeCriticalSection;
+
+        Windows::Foundation::Size mCustomRenderSurfaceSize;
+        bool mUseCustomRenderSurfaceSize;
+
+        EGLSurface mRenderSurface;     // This surface is associated with a swapChainPanel on the page
+        Concurrency::critical_section mRenderSurfaceCriticalSection;
+        Windows::Foundation::IAsyncAction^ mRenderLoopWorker;
+
+        // Track user input on a background worker thread.
+        Windows::Foundation:
