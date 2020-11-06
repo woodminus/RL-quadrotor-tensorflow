@@ -23,3 +23,33 @@
 using namespace std;
 
 const int numOfQuadrocopters = 50;
+
+QuadrocopterBrain quadrocopterBrain;
+vector<ObservationSeqLimited> currStateSeqs;
+vector<ObservationSeqLimited> prevStateSeqs;
+vector<ExpLambdaFilter> experienceFilters; //one filter for each quadrocopter;
+vector<double> randomnessOfQuadrocopter;
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API SetQuadrocopterState(
+	int quadrocopterId,
+	float* stateData
+) {
+
+	std::vector<float> stateV;
+	stateV.resize(QuadrocopterBrain::observationSize);
+	stateV.assign(stateData, stateData + QuadrocopterBrain::observationSize);
+	Observation state (stateV);
+
+	ObservationSeqLimited& currStateSeq = currStateSeqs [quadrocopterId];
+	prevStateSeqs [quadrocopterId] = currStateSeq;
+	currStateSeq.push(state);
+}
+
+extern "C" long UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API QuadrocopterBrainAct(
+	int quadrocopterId
+) {
+	return quadrocopterBrain.act (
+		currStateSeqs [quadrocopterId],
+		randomnessOfQuadrocopter [quadrocopterId]
+	);
+}
