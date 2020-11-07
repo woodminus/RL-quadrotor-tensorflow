@@ -53,3 +53,40 @@ extern "C" long UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API QuadrocopterBrainAct(
 		randomnessOfQuadrocopter [quadrocopterId]
 	);
 }
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API StoreQuadrocopterExperience (
+	int quadrocopterId,
+	double reward,
+	long action
+) {
+	
+	ExperienceItem expItem (
+		prevStateSeqs [quadrocopterId],
+		currStateSeqs [quadrocopterId],
+		reward,
+		action
+	);
+
+	experienceFilters [quadrocopterId].storeExperience(expItem);
+//	quadrocopterBrain.storeExperience(expItem);
+}
+
+void initApiDiscreteDeepQ () {
+	currStateSeqs.resize(numOfQuadrocopters);
+	prevStateSeqs.resize(numOfQuadrocopters);
+	experienceFilters.resize(numOfQuadrocopters);
+
+	Observation ob;
+	ob.setZeros(QuadrocopterBrain::observationSize);
+	
+	ObservationSeqLimited obs;
+	obs.setLimit(QuadrocopterBrain::observationsInSeq);
+	obs.initWith(ob);
+
+	for (int i=0; i<numOfQuadrocopters; i++) {
+		currStateSeqs [i] = obs;
+		prevStateSeqs [i] = obs;
+		experienceFilters [i].setExperienceTarget(&quadrocopterBrain);
+		
+//		if (i < 1) {
+//			randomnessOfQuadrocopter.push_back(0.9
