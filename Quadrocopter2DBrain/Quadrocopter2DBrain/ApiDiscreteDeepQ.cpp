@@ -128,4 +128,15 @@ void initApiDiscreteDeepQ () {
 ////		reward,
 ////		actionsScoresV
 ////	);
-//
+////
+////	quadrocopterBrain.storeExperience(expItem);
+//}
+
+//extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetQuadrocopterActionsScores(float* actionsScoredVals) {
+//	auto actionsScores = quadrocopterBrain.getActionsScores();
+////	cerr << "--- get actions scores: " << endl;
+//	for (int i=0; i<6; i++) {
+//		actionsScoredVals [i] = actionsScores [i];
+////		cerr << "--- " << actionsScoredVals [i] << endl;
+//	}
+//}
