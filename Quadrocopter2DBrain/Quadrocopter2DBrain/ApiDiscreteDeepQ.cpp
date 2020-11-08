@@ -89,4 +89,43 @@ void initApiDiscreteDeepQ () {
 		experienceFilters [i].setExperienceTarget(&quadrocopterBrain);
 		
 //		if (i < 1) {
-//			randomnessOfQuadrocopter.push_back(0.9
+//			randomnessOfQuadrocopter.push_back(0.9);
+//		} else if (i < 10) {
+//			randomnessOfQuadrocopter.push_back(0.5);
+//		} else {
+			randomnessOfQuadrocopter.push_back(0.05);
+//		}
+	}
+}
+
+
+
+//extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API StoreQuadrocopterExperienceContinous (
+//	float* prevStateData,
+//	float* nextStateData,
+//	double reward,
+//	float* actionsScores
+//) {
+//
+////	std::vector<float> prevStateV;
+////	std::vector<float> nextStateV;
+////	std::vector<float> actionsScoresV;
+////	
+////	prevStateV.resize(5);
+////	nextStateV.resize(5);
+////	actionsScoresV.resize(6);
+////	
+////	prevStateV.assign(prevStateData, prevStateData + 5);
+////	nextStateV.assign(nextStateData, nextStateData + 5);
+////	actionsScoresV.assign(actionsScores, actionsScores + 6);
+////
+////	Observation prevState (prevStateV);
+////	Observation nextState (nextStateV);
+////	
+////	ExperienceItem expItem (
+////		prevState,
+////		nextState,
+////		reward,
+////		actionsScoresV
+////	);
+//
