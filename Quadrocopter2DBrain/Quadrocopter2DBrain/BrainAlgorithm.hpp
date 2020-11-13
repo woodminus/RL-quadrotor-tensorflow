@@ -38,4 +38,9 @@ public:
 	virtual float trainOnMinibatch (std::vector<const ExperienceItem*> minibatch) = 0;
 	virtual float trainOnMinibatch (std::vector<ExperienceItem*> minibatch) = 0;
 
-	v
+	virtual void setExplorationPeriod (int explorationPeriod) = 0;
+	virtual void saveGraphState (const std::string fileSuffix) = 0;
+
+};
+
+#endif /* BrainAlgorithm_hpp */
