@@ -47,4 +47,29 @@ public:
 //	*/
 //	float train (
 //		const std::vector<ExperienceItem>& experience,
-//		std::vector
+//		std::vector<const ExperienceItem*>& minibatch
+//	);
+//	
+//	float train (
+//		const std::vector<ExperienceItem>& expLow,
+//		const std::vector<ExperienceItem>& expMid,
+//		const std::vector<ExperienceItem>& expHigh,
+//		std::vector<const ExperienceItem*>& minibatch
+//	);
+
+	/**
+		@return prediction error on choosed minibatch
+	*/
+	float trainOnMinibatch (std::vector<const ExperienceItem*> minibatch) override;
+	float trainOnMinibatch (std::vector<const ExperienceItem*> minibatch, std::vector<tensorflow::Tensor>& outputTensors);
+
+	float trainOnMinibatch (std::vector<ExperienceItem*> minibatch) override { return -1; }
+	
+	void predictNextStateAndReward (const ObservationSeqLimited& state, long action);
+	void trainEnvModel (const std::vector<ExperienceItem>& experience);
+//	void setRandomness (double randomness);
+	void setExplorationPeriod (int explorationPeriod) override;
+
+	void saveGraphState (const std::string fileSuffix) override;
+	
+protec
