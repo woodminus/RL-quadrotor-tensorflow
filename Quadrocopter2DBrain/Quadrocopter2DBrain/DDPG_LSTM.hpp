@@ -21,4 +21,14 @@ public:
 	void control (const ObservationSeqLimited& ob, std::vector<float>& action, double randomness) override;
 
 	/**
-		@return prediction error on choosed miniba
+		@return prediction error on choosed minibatch
+	*/
+	float trainOnMinibatch (std::vector<const ExperienceItem*> minibatch) override;
+
+private:
+
+  std::default_random_engine randomGenerator;
+
+};
+
+#endif /* DDPG_LSTM_hpp */
