@@ -19,4 +19,17 @@ public:
 	void storeExperience (const ExperienceItem& expItem);
 	void setExperienceTarget (QuadrocopterBrain* target);
 
-priv
+private:
+
+	const static int filterLength = 20;
+	double lambda = 0.3;
+	std::deque<ExperienceItem> expItems;
+	std::deque<double> realRewards;
+
+	QuadrocopterBrain* expTarget;
+
+	void lambdaTheExp ();
+
+};
+
+#endif /* ExpLambdaFilter_hpp */
