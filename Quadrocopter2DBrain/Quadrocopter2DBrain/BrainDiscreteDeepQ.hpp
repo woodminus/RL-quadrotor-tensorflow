@@ -72,4 +72,26 @@ public:
 
 	void saveGraphState (const std::string fileSuffix) override;
 	
-protec
+protected:
+
+	std::mutex saveGraphMutex;
+
+	void initGraphState ();
+	bool loadGraphState ();
+
+	int actionsExecutedSoFar = 0;
+	
+	//linear annealing parameters
+	std::atomic<int> explorationPeriod;
+	int explorationPeriodInitial;
+	double randomActionProbabilityInitial = 0.6;
+	
+	tensorflow::GraphDef graph_def;
+	tensorflow::Session* session;
+	
+	double linearAnnealing(double randomActionProbabilityFinal);
+	
+
+};
+
+#endif /* BrainDiscreteDeepQ_hpp */
