@@ -46,4 +46,20 @@ id(idSeq++),
 prevStates(prevStates),
 nextStates(nextStates),
 reward(reward),
-rewardLambda(
+rewardLambda(reward),
+actionCont(actionCont)
+
+{}
+
+ExperienceItem::ExperienceItem (
+	const ObservationSeqLimited& prevStates,
+	const ObservationSeqLimited& nextStates,
+	const ObservationSeqLimited& reward,
+	const ObservationSeqLimited& actionCont
+) :
+	id(idSeq++),
+	prevStates(prevStates),
+	nextStates(nextStates),
+	lstmRewards(reward),
+	lstmActions(actionCont)
+{}
