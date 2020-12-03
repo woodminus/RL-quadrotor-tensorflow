@@ -42,3 +42,16 @@ std::vector<long> Lib::getRandomNonRepeatSeries (
 	long size,
 	long min,
 	long max
+) {
+	std::vector<long> series;
+	for (int i=0; i<size; i++) {
+		while (true) {
+			long newItem = randLong (min, max);
+			if (std::find(series.begin(), series.end(), newItem) == series.end()) {
+				series.push_back (newItem);
+				break;
+			}
+		}
+	}
+	return series;
+};
