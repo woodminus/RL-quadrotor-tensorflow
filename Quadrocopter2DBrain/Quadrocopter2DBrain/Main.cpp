@@ -59,4 +59,29 @@ void DebugLog (std::string str)
 #endif
 }
 
-static void UNITY_INTERFACE_API OnRenderEvent(int even
+static void UNITY_INTERFACE_API OnRenderEvent(int eventID) {
+	cerr << "--- OnRenderEvent" << endl;
+//	processRenderEvent(eventID);
+//	quadrocopterBrain.act();
+}
+
+// --------------------------------------------------------------------------
+// UnitySetInterfaces
+
+static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType);
+
+static IUnityInterfaces* s_UnityInterfaces = NULL;
+static IUnityGraphics* s_Graphics = NULL;
+static UnityGfxRenderer s_DeviceType = kUnityGfxRendererNull;
+
+extern "C" void	UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnityInterfaces* unityInterfaces)
+{
+    DebugLog("--- UnityPluginLoad");
+    s_UnityInterfaces = unityInterfaces;
+    s_Graphics = s_UnityInterfaces->Get<IUnityGraphics>();
+    s_Graphics->RegisterDeviceEventCallback(OnGraphicsDeviceEvent);
+	
+    // Run OnGraphicsDeviceEvent(initialize) manually on plugin load
+    OnGraphicsDeviceEvent(kUnityGfxDeviceEventInitialize);
+
+	initApiDiscreteDee
