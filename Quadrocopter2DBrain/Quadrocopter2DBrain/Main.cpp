@@ -84,4 +84,34 @@ extern "C" void	UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnit
     // Run OnGraphicsDeviceEvent(initialize) manually on plugin load
     OnGraphicsDeviceEvent(kUnityGfxDeviceEventInitialize);
 
-	initApiDiscreteDee
+	initApiDiscreteDeepQ();
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
+{
+    s_Graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
+}
+
+// --------------------------------------------------------------------------
+// GraphicsDeviceEvent
+
+// Actual setup/teardown functions defined below
+#if SUPPORT_D3D9
+static void DoEventGraphicsDeviceD3D9(UnityGfxDeviceEventType eventType);
+#endif
+#if SUPPORT_D3D11
+static void DoEventGraphicsDeviceD3D11(UnityGfxDeviceEventType eventType);
+#endif
+#if SUPPORT_D3D12
+static void DoEventGraphicsDeviceD3D12(UnityGfxDeviceEventType eventType);
+#endif
+#if SUPPORT_OPENGLES
+static void DoEventGraphicsDeviceGLES(UnityGfxDeviceEventType eventType);
+#endif
+
+static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType)
+{
+    UnityGfxRenderer currentDeviceType = s_DeviceType;
+    
+    switch (eventType)
+ 
