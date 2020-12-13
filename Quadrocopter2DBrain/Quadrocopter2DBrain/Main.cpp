@@ -114,4 +114,35 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     UnityGfxRenderer currentDeviceType = s_DeviceType;
     
     switch (eventType)
- 
+    {
+        case kUnityGfxDeviceEventInitialize:
+        {
+            DebugLog("OnGraphicsDeviceEvent(Initialize).\n");
+            s_DeviceType = s_Graphics->GetRenderer();
+            currentDeviceType = s_DeviceType;
+            break;
+        }
+            
+        case kUnityGfxDeviceEventShutdown:
+        {
+            DebugLog("OnGraphicsDeviceEvent(Shutdown).\n");
+            s_DeviceType = kUnityGfxRendererNull;
+            break;
+        }
+            
+        case kUnityGfxDeviceEventBeforeReset:
+        {
+            DebugLog("OnGraphicsDeviceEvent(BeforeReset).\n");
+            break;
+        }
+            
+        case kUnityGfxDeviceEventAfterReset:
+        {
+            DebugLog("OnGraphicsDeviceEvent(AfterReset).\n");
+            break;
+        }
+    };
+    
+#if SUPPORT_D3D9
+    if (currentDeviceType == kUnityGfxRendererD3D9)
+        DoEventGraphicsDevice
