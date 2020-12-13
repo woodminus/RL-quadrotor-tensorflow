@@ -145,4 +145,29 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType ev
     
 #if SUPPORT_D3D9
     if (currentDeviceType == kUnityGfxRendererD3D9)
-        DoEventGraphicsDevice
+        DoEventGraphicsDeviceD3D9(eventType);
+#endif
+    
+#if SUPPORT_D3D11
+    if (currentDeviceType == kUnityGfxRendererD3D11)
+        DoEventGraphicsDeviceD3D11(eventType);
+#endif
+    
+#if SUPPORT_D3D12
+    if (currentDeviceType == kUnityGfxRendererD3D12)
+        DoEventGraphicsDeviceD3D12(eventType);
+#endif
+    
+#if SUPPORT_OPENGLES
+    if (currentDeviceType == kUnityGfxRendererOpenGLES20 ||
+        currentDeviceType == kUnityGfxRendererOpenGLES30)
+        DoEventGraphicsDeviceGLES(eventType);
+#endif
+}
+
+// --------------------------------------------------------------------------
+// GetRenderEventFunc, an example function we export which is used to get a rendering event callback function.
+extern "C" UnityRenderingEvent UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventFunc()
+{
+    return OnRenderEvent;
+}
