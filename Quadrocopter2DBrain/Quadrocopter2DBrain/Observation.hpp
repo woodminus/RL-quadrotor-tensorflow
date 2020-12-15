@@ -13,4 +13,25 @@
 
 class Observation {
 
-pub
+public:
+
+	Observation ();
+
+	Observation (
+		const std::vector<float>& data
+	);
+
+	void set (
+		const std::vector<float>& data
+	);
+	
+	void setZeros (int len);
+
+	std::vector<float> data;
+	
+	int getSize () const;
+	void print () const;
+
+};
+
+#endif /* Observation_hpp */
