@@ -25,4 +25,40 @@ void ObservationSeqLimited::setLimit (int limit) {
 }
 
 void ObservationSeqLimited::initWith (const Observation& ob) {
-	for (int i=0;
+	for (int i=0; i<limit; i++) {
+		push (ob);
+	}
+}
+
+void ObservationSeqLimited::push (const Observation& ob) {
+//std::cerr << "push: " << newItemPos << std::endl;
+	observations [newItemPos] = ob;
+	newItemPos++;
+	newItemPos %= limit;
+}
+
+int ObservationSeqLimited::getSize () const {
+	if (limit == 0) return 0;
+	else return limit * observations.front().getSize();
+}
+
+void fillTensor (const ObservationSeqLimited& obs, tensorflow::Tensor& t, int tensorIndex) {
+	int observationSize = obs.observations.front().getSize();
+	
+	int obIndex = obs.newItemPos;
+	int datai = 0;
+	for (int obFilled = 0; obFilled<obs.limit; obFilled++) {
+//std::cerr << "fill: obIndex: " << obIndex << " datai: " << datai << std::endl;
+		auto& ob = obs.observations [obIndex];
+	
+		for (int i=0; i<observationSize; i++) {
+			t.matrix<float>()(tensorIndex, datai++) = ob.data [i];
+//std::cerr << "fill: data: " << ob.data [i] << std::endl;
+		}
+		
+		obIndex++;
+		obIndex %= obs.limit;
+	}
+}
+
+void fillTensor3D (
