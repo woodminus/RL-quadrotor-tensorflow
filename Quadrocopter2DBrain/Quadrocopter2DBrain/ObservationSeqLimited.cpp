@@ -91,4 +91,11 @@ void ObservationSeqLimited::print () const {
 		std::cout << "." << std::endl;
 		
 		obIndex++;
-		obIndex %= limi
+		obIndex %= limit;
+	}
+	std::cout << std::endl;
+}
+
+const Observation& ObservationSeqLimited::getObservation (int index) const {
+	return observations [index];
+}
