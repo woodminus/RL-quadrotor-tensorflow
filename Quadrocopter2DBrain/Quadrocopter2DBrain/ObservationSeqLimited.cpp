@@ -61,4 +61,34 @@ void fillTensor (const ObservationSeqLimited& obs, tensorflow::Tensor& t, int te
 	}
 }
 
-void fillTensor3D (
+void fillTensor3D (const ObservationSeqLimited& obs, tensorflow::Tensor& t, int tensorIndex) {
+	int obsS = obs.observations.size ();
+	int obS = obs.observations.front().getSize();
+	
+	int obIndex = obs.newItemPos;
+	for (int obsI=0; obsI < obsS; obsI++) {
+		auto& ob = obs.observations [obIndex];
+		for (int obI=0; obI < obS; obI++) {
+			t.tensor<float, 3>()(tensorIndex, obsI, obI) = ob.data[obI];
+		}
+		
+		obIndex++;
+		obIndex %= obs.limit;
+	}
+}
+
+void ObservationSeqLimited::print () const {
+	int obsS = observations.size ();
+	int obS = observations.front().getSize();
+	
+	int obIndex = newItemPos;
+	for (int obsI=0; obsI < obsS; obsI++) {
+		auto& ob = observations [obIndex];
+		for (int obI=0; obI < obS; obI++) {
+//			t.tensor<float, 3>()(tensorIndex, obsI, obI) = ob.data[obI];
+			std::cout << ob.data[obI] << " ";
+		}
+		std::cout << "." << std::endl;
+		
+		obIndex++;
+		obIndex %= limi
