@@ -90,4 +90,41 @@ namespace Quadrocopter2DBrain {
   }
 
 	void quadrocopterBrainActContLSTMWeak(
-		int quadr
+		int quadrocopterId,
+		const std::vector<float>& state,
+		std::vector<float>& action
+	) {
+		auto& exp = lstmWeakExperience [quadrocopterId];
+		
+//if (quadrocopterId == 14) {
+//	std::cout << "state C" << std::endl;
+//	for (auto& s : exp.actorLstmStateC) {
+//		std::cout << s << " ";
+//	}
+//	std::cout << "state H" << std::endl;
+//	for (auto& s : exp.actorLstmStateH) {
+//		std::cout << s << " ";
+//	}
+//	std::cout << std::endl << std::endl;
+//}
+
+		quadrocopterBrain.actContLSTMWeak(state, exp.actorLstmStateC, exp.actorLstmStateH, randomnessOfQuadrocopter [quadrocopterId], action);
+	}
+	
+	void quadrocopterBrainActContMLPSeq(
+		int quadrocopterId,
+		const std::vector<float>& state,
+		std::vector<float>& action
+	) {
+		auto& seq = prevObsMLPSeq [quadrocopterId];
+		seq.push(state);
+
+//if (quadrocopterId == 14) {
+//	std::cout << "seq" << std::endl;
+//	seq.print();
+//}
+
+		quadrocopterBrain.actCont (
+			seq,
+			action,
+			ra
