@@ -56,4 +56,38 @@ namespace Quadrocopter2DBrain {
 //
 //	//	std::vector<float> stateV;
 //	//	stateV.resize(QuadrocopterBrain::observationSize);
-//	//	s
+//	//	stateV.assign(stateData, stateData + QuadrocopterBrain::observationSize);
+//		Observation state (stateV);
+//
+////		ObservationSeqLimited& currStateSeq = currStateSeqs [quadrocopterId];
+////		prevStateSeqs [quadrocopterId] = currStateSeq;
+////		currStateSeq.push(state);
+//	}
+
+	long quadrocopterBrainAct(
+		int quadrocopterId,
+		const std::vector<float>& state
+	) {
+		return quadrocopterBrain.act (
+			ObservationSeqLimited (state),
+			randomnessOfQuadrocopter [quadrocopterId]
+		);
+	}
+
+	void quadrocopterBrainActCont(
+		int quadrocopterId,
+		const std::vector<float>& state,
+		std::vector<float>& action
+	) {
+		quadrocopterBrain.actCont (
+			ObservationSeqLimited (state),
+			action,
+			randomnessOfQuadrocopter [quadrocopterId]
+		);
+    if (quadrocopterId == 0) {
+      std::cout << "val: " << action[0] << " : " << action[1] << std::endl;
+    }
+  }
+
+	void quadrocopterBrainActContLSTMWeak(
+		int quadr
