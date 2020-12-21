@@ -127,4 +127,44 @@ namespace Quadrocopter2DBrain {
 		quadrocopterBrain.actCont (
 			seq,
 			action,
-			ra
+			randomnessOfQuadrocopter [quadrocopterId]
+		);
+	}
+
+	void storeQuadrocopterExperience (
+		int quadrocopterId,
+		double reward,
+		long action,
+		const std::vector <float>& prevState,
+		const std::vector <float>& nextState
+	) {
+		
+		ExperienceItem expItem (
+			ObservationSeqLimited (prevState),
+			ObservationSeqLimited (nextState),
+			reward,
+			action
+		);
+
+//		experienceFilters [quadrocopterId].storeExperience(expItem);
+		quadrocopterBrain.storeExperience(expItem);
+	}
+
+	void storeQuadrocopterExperienceCont (
+		int quadrocopterId,
+		double reward,
+		std::vector<float>& action,
+		const std::vector <float>& prevState,
+		const std::vector <float>& nextState
+	) {
+		ExperienceItem expItem (
+			ObservationSeqLimited (prevState),
+			ObservationSeqLimited (nextState),
+			reward,
+			action
+		);
+		
+		quadrocopterBrain.storeExperience(expItem);
+	}
+
+	void storeQuadrocopterExperienceCo
