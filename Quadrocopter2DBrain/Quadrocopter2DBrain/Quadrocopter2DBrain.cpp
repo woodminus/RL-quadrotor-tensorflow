@@ -199,4 +199,47 @@ namespace Quadrocopter2DBrain {
 		
 //		std::cout << "q: " << quadrocopterId << std::endl;
 		auto& seq = prevObsSeq [quadrocopterId];
-		s
+		seq.push(Observation(state));
+//		seq.print();
+		
+		quadrocopterBrain.actCont (
+			seq,
+			action,
+			randomnessOfQuadrocopter [quadrocopterId]
+		);
+	}
+
+	void storeQuadrocopterExperienceContLSTM (
+		int quadrocopterId,
+		double reward,
+		std::vector<float>& action,
+		const std::vector <float>& prevState,
+		const std::vector <float>& nextState
+	) {
+
+		auto& pSeq = prevObsSeq [quadrocopterId];
+		auto& nSeq = nextObsSeq [quadrocopterId];
+		auto& a = lstmActions [quadrocopterId];
+		auto& r = lstmRewards [quadrocopterId];
+		
+		nSeq.push(Observation(nextState));
+		a.push(Observation(action));
+		r.push(Observation(std::vector<float> (1, reward)));
+
+		ExperienceItem expItem (
+			pSeq,
+			nSeq,
+			r,
+			a
+		);
+		expItem.reward = reward;
+		expItem.rewardLambda = reward;
+		
+		quadrocopterBrain.storeExperience(expItem);
+	}
+
+	void storeQuadrocopterExperienceContMLPSeq (
+		int quadrocopterId,
+		double reward,
+		std::vector<float>& action,
+		const 
