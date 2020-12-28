@@ -242,4 +242,41 @@ namespace Quadrocopter2DBrain {
 		int quadrocopterId,
 		double reward,
 		std::vector<float>& action,
-		const 
+		const std::vector <float>& prevState,
+		const std::vector <float>& nextState
+	) {
+		auto& pSeq = prevObsMLPSeq [quadrocopterId];
+		auto& nSeq = nextObsMLPSeq [quadrocopterId];
+		
+		nSeq.push (nextState);
+
+//if (reward == -1)
+//if (quadrocopterId == 14) {
+//	std::cout << "r " << reward << std::endl;
+//	std::cout << "prev" << std::endl;
+//	pSeq.print();
+//	std::cout << "next" << std::endl;
+//	nSeq.print();
+//}
+
+		quadrocopterBrain.storeExperience(ExperienceItem (
+			pSeq,
+			nSeq,
+			reward,
+			action
+		));
+	}
+
+	void initApiDiscreteDeepQ () {
+//		currStateSeqs.resize(numOfQuadrocopters);
+//		prevStateSeqs.resize(numOfQuadrocopters);
+		experienceFilters.resize(numOfQuadrocopters);
+		randomnessOfQuadrocopter.clear ();
+		Observation ob;
+		ob.setZeros(QuadrocopterBrain::observationSize);
+		Observation action;
+		action.setZeros(QuadrocopterBrain::contActionSize);
+		Observation reward;
+		reward.setZeros(1);
+
+//
