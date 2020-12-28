@@ -167,4 +167,36 @@ namespace Quadrocopter2DBrain {
 		quadrocopterBrain.storeExperience(expItem);
 	}
 
-	void storeQuadrocopterExperienceCo
+	void storeQuadrocopterExperienceContLSTMWeak (
+		int quadrocopterId,
+		double reward,
+		std::vector<float>& action,
+		const std::vector <float>& prevState,
+		const std::vector <float>& nextState
+	) {
+		auto& exp = lstmWeakExperience [quadrocopterId];
+		
+		exp.reward = reward;
+		exp.rewardLambda = reward;
+		exp.actionCont = action;
+		exp.prevStates = ObservationSeqLimited (prevState);
+		exp.nextStates = ObservationSeqLimited (nextState);
+//std::cout << "--- size: " << exp.prevStates.getSize() << " / " << lstmWeakExperienceMinibatch[quadrocopterId]->prevStates.getSize() << std::endl;
+	}
+
+	void quadrocopterBrainActContLSTM(
+		int quadrocopterId,
+		const std::vector<float>& state,
+		std::vector<float>& action
+	) {
+	
+//		ObservationSeqLimited obs(states.size());
+//		for (auto& s : states) {
+//			obs.push(Observation(*s));
+//		}
+//		
+//		obs.print();
+		
+//		std::cout << "q: " << quadrocopterId << std::endl;
+		auto& seq = prevObsSeq [quadrocopterId];
+		s
