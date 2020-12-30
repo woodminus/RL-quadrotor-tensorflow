@@ -279,4 +279,25 @@ namespace Quadrocopter2DBrain {
 		Observation reward;
 		reward.setZeros(1);
 
-//
+//		ObservationSeqLimited obs;
+//		obs.setLimit(QuadrocopterBrain::observationsInSeq);
+//		obs.initWith(ob);
+
+		prevObsSeq.resize(numOfQuadrocopters);
+		nextObsSeq.resize(numOfQuadrocopters);
+		lstmActions.resize(numOfQuadrocopters);
+		lstmRewards.resize(numOfQuadrocopters);
+		
+		prevObsMLPSeq.resize(numOfQuadrocopters);
+		nextObsMLPSeq.resize(numOfQuadrocopters);
+		
+		lstmWeakExperience.resize(numOfQuadrocopters);
+		lstmWeakExperienceMinibatch.clear();
+		
+		for (int i=0; i<numOfQuadrocopters; i++) {
+		
+			lstmWeakExperience [i].actorLstmStateC.assign(QuadrocopterBrain::lstmStateSize, 0);
+			lstmWeakExperience [i].actorLstmStateH.assign(QuadrocopterBrain::lstmStateSize, 0);
+			lstmWeakExperience [i].criticLstmStateC.assign(QuadrocopterBrain::lstmStateSize, 0);
+			lstmWeakExperience [i].criticLstmStateH.assign(QuadrocopterBrain::lstmStateSize, 0);
+			lstmWeakExperience [i].targetActorLstmStateC.assign(Q
