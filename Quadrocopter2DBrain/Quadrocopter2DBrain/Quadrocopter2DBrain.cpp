@@ -359,4 +359,23 @@ namespace Quadrocopter2DBrain {
 		int quadrocopterId,
 		const std::vector <float>& copterState
 	) {
-		au
+		auto& exp = lstmWeakExperience [quadrocopterId];
+		exp.actorLstmStateC.assign(QuadrocopterBrain::lstmStateSize, 0);
+		exp.actorLstmStateH.assign(QuadrocopterBrain::lstmStateSize, 0);
+		exp.criticLstmStateC.assign(QuadrocopterBrain::lstmStateSize, 0);
+		exp.criticLstmStateH.assign(QuadrocopterBrain::lstmStateSize, 0);
+		exp.targetActorLstmStateC.assign(QuadrocopterBrain::lstmStateSize, 0);
+		exp.targetActorLstmStateH.assign(QuadrocopterBrain::lstmStateSize, 0);
+		exp.targetCriticLstmStateC.assign(QuadrocopterBrain::lstmStateSize, 0);
+		exp.targetCriticLstmStateH.assign(QuadrocopterBrain::lstmStateSize, 0);
+		
+		exp.reward = 0;
+		exp.rewardLambda = 0;
+		exp.actionCont.assign(QuadrocopterBrain::contActionSize, 0);
+		exp.prevStates = ObservationSeqLimited (copterState);
+		exp.nextStates = ObservationSeqLimited (copterState);
+	}
+	
+	void resetQuadrocopterMLPSeq (
+		int quadrocopterId,
+		const std::vector <float>& copterS
