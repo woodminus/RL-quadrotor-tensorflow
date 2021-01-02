@@ -300,4 +300,22 @@ namespace Quadrocopter2DBrain {
 			lstmWeakExperience [i].actorLstmStateH.assign(QuadrocopterBrain::lstmStateSize, 0);
 			lstmWeakExperience [i].criticLstmStateC.assign(QuadrocopterBrain::lstmStateSize, 0);
 			lstmWeakExperience [i].criticLstmStateH.assign(QuadrocopterBrain::lstmStateSize, 0);
-			lstmWeakExperience [i].targetActorLstmStateC.assign(Q
+			lstmWeakExperience [i].targetActorLstmStateC.assign(QuadrocopterBrain::lstmStateSize, 0);
+			lstmWeakExperience [i].targetActorLstmStateH.assign(QuadrocopterBrain::lstmStateSize, 0);
+			lstmWeakExperience [i].targetCriticLstmStateC.assign(QuadrocopterBrain::lstmStateSize, 0);
+			lstmWeakExperience [i].targetCriticLstmStateH.assign(QuadrocopterBrain::lstmStateSize, 0);
+
+			lstmWeakExperienceMinibatch.push_back(&lstmWeakExperience [i]);
+		
+			prevObsSeq [i].setLimit(QuadrocopterBrain::lstmStepsCount);
+			prevObsSeq [i].initWith(ob);
+			nextObsSeq [i].setLimit(QuadrocopterBrain::lstmStepsCount);
+			nextObsSeq [i].initWith(ob);
+			lstmActions [i].setLimit(QuadrocopterBrain::lstmStepsCount);
+			lstmActions [i].initWith(action);
+			lstmRewards [i].setLimit(QuadrocopterBrain::lstmStepsCount);
+			lstmRewards [i].initWith(reward);
+
+			prevObsMLPSeq [i].setLimit(QuadrocopterBrain::mlpSeqSize);
+			prevObsMLPSeq [i].initWith(ob);
+			nextObsMLPSeq 
