@@ -318,4 +318,45 @@ namespace Quadrocopter2DBrain {
 
 			prevObsMLPSeq [i].setLimit(QuadrocopterBrain::mlpSeqSize);
 			prevObsMLPSeq [i].initWith(ob);
-			nextObsMLPSeq 
+			nextObsMLPSeq [i].setLimit(QuadrocopterBrain::mlpSeqSize);
+			nextObsMLPSeq [i].initWith(ob);
+		
+			experienceFilters [i].setExperienceTarget(&quadrocopterBrain);
+			
+			if (i < 2) {
+				randomnessOfQuadrocopter.push_back(0.1);
+			} else
+			if (i < 10) {
+				randomnessOfQuadrocopter.push_back(0.05);
+			}
+			else {
+				randomnessOfQuadrocopter.push_back(0.0);
+			}
+		}
+	}
+
+	bool quadrocopterBrainTrain () {
+		if (useLstmWeak) {
+			return quadrocopterBrain.trainOnMinibatch(lstmWeakExperienceMinibatch);
+		} else {
+			return quadrocopterBrain.train();
+		}
+	}
+	
+	bool getBigErrorExp (
+		std::vector <float>& state
+	) {
+		ExperienceItem expItem;
+		bool got = quadrocopterBrain.getMaxErrorExp(expItem);
+		if (got) {
+			state = expItem.prevStates.getObservation(0).data;
+			return true;
+		}
+		return false;
+	}
+
+	void resetQuadrocopterLSTMWeak (
+		int quadrocopterId,
+		const std::vector <float>& copterState
+	) {
+		au
