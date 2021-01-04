@@ -59,3 +59,42 @@ namespace Quadrocopter2DBrain {
 		const std::vector <float>& prevState,
 		const std::vector <float>& nextState
 	);
+
+	void storeQuadrocopterExperienceCont (
+		int quadrocopterId,
+		double reward,
+		std::vector<float>& action,
+		const std::vector <float>& prevState,
+		const std::vector <float>& nextState
+	);
+
+	void storeQuadrocopterExperienceContLSTMWeak (
+		int quadrocopterId,
+		double reward,
+		std::vector<float>& action,
+		const std::vector <float>& prevState,
+		const std::vector <float>& nextState
+	);
+
+	void storeQuadrocopterExperienceContLSTM (
+		int quadrocopterId,
+		double reward,
+		std::vector<float>& action,
+		const std::vector <float>& prevState,
+		const std::vector <float>& nextState
+	);
+
+	void storeQuadrocopterExperienceContMLPSeq (
+		int quadrocopterId,
+		double reward,
+		std::vector<float>& action,
+		const std::vector <float>& prevState,
+		const std::vector <float>& nextState
+	);
+	
+	void resetQuadrocopterLSTMWeak (
+		int quadrocopterId,
+		const std::vector <float>& copterState
+	);
+	
+	vo
