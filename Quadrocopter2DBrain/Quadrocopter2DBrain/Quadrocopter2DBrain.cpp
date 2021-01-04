@@ -378,4 +378,30 @@ namespace Quadrocopter2DBrain {
 	
 	void resetQuadrocopterMLPSeq (
 		int quadrocopterId,
-		const std::vector <float>& copterS
+		const std::vector <float>& copterState
+	) {
+		Observation ob;
+		ob.setZeros(QuadrocopterBrain::observationSize);
+		
+		prevObsMLPSeq [quadrocopterId].initWith(ob);
+		nextObsMLPSeq [quadrocopterId].initWith(ob);
+	}
+	
+	void resetQuadrocopterLSTM (
+		int quadrocopterId
+	) {
+		Observation ob;
+		ob.setZeros(QuadrocopterBrain::observationSize);
+		Observation action;
+		action.setZeros(QuadrocopterBrain::contActionSize);
+		Observation reward;
+		reward.setZeros(1);
+
+		prevObsSeq [quadrocopterId].initWith(ob);
+		nextObsSeq [quadrocopterId].initWith(ob);
+		lstmActions [quadrocopterId].initWith(action);
+		lstmRewards [quadrocopterId].initWith(reward);
+	}
+
+}
+
