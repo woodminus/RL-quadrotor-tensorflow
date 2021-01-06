@@ -97,4 +97,19 @@ namespace Quadrocopter2DBrain {
 		const std::vector <float>& copterState
 	);
 	
-	vo
+	void resetQuadrocopterMLPSeq (
+		int quadrocopterId,
+		const std::vector <float>& copterState
+	);
+	
+	void resetQuadrocopterLSTM (
+		int quadrocopterId
+	);
+	
+	bool getBigErrorExp (
+		std::vector <float>& state
+	);
+
+}
+
+#endif /* Quadrocopter2DBrain_hpp */
