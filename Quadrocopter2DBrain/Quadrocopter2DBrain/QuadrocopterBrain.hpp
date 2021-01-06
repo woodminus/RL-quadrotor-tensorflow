@@ -48,4 +48,39 @@ public:
 	void actCont (const ObservationSeqLimited& state, std::vector<float>& action, double randomness);
 	void actContLSTMWeak (
 		const ObservationSeqLimited& state,
-		const std::vector<fl
+		const std::vector<float>& actorLstmStateC,
+		const std::vector<float>& actorLstmStateH,
+		double randomness,
+		std::vector<float>& action//,
+//		std::vector<float>& newLstmStateC,
+//		std::vector<float>& newLstmStateH
+	);
+	
+	void storeExperience (const ExperienceItem& expItem);
+	
+	bool train ();
+	bool trainOnMinibatch (std::vector<ExperienceItem*> minibatch);
+	
+	bool getMaxErrorExp (ExperienceItem& expItem);
+	
+private:
+
+	std::shared_ptr<BrainAlgorithm> brain;
+//	BrainDiscreteDeepQ brain;
+	ExperienceBank experienceLow;
+//	ExperienceBank experienceMid;
+//	ExperienceBank experienceHigh;
+
+	std::atomic<long> actExecuted;
+	std::atomic<long> trainExecuted;
+	long storeExecuted = 0;
+	double allReward = 0;
+	
+	double averageErr = 0;
+	std::list<double> lastErrs;
+	std::list<ExperienceItem> maxErrorExp;
+	std::mutex mtxMaxErrorExp;
+	
+  static const int storeEveryNth = 5;
+	static const int trainEveryNth = 1000; //act
+	static const i
