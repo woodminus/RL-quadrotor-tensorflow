@@ -83,4 +83,16 @@ private:
 	
   static const int storeEveryNth = 5;
 	static const int trainEveryNth = 1000; //act
-	static const i
+	static const int trainCount = 1;
+  static const int trainAfter = 20000; //50000; //stored exp
+
+	//train
+	constexpr static float probHigh = 0.55;
+	constexpr static float probMid = 0.3;
+	constexpr static float probLow = 0.15;
+	
+	void addMaxErrorExp (const ExperienceItem& expItem);
+
+};
+
+#endif /* QuadrocopterBrain_hpp */
