@@ -68,4 +68,25 @@ model_mlp = MLP([model_input_size,], [128, model_output_size],
             [tf.tanh, tf.identity], scope="env_model_mlp")
 
 model_input = tf.placeholder(tf.float32, [None, model_input_size], name="env_model_input")
-model_prediction = tf.identity( model_mlp (model_input), name="env_model_
+model_prediction = tf.identity( model_mlp (model_input), name="env_model_prediction")
+
+model_train_data = tf.placeholder(tf.float32, [None, model_output_size], name="env_model_train_data")
+
+model_sqerror = tf.reduce_mean(tf.square(model_prediction - model_train_data), name="env_model_prediction_error")
+
+model_optimizer = tf.train.RMSPropOptimizer(learning_rate= 0.0001, decay=0.9)
+model_gradients = model_optimizer.compute_gradients(model_sqerror)
+model_train_step = model_optimizer.apply_gradients(model_gradients, name="env_model_train_step")
+
+
+
+init_all_vars_op = tf.initialize_variables(tf.all_variables(), name='init_all_vars_op')
+
+session.run(tf.initialize_all_variables())
+
+#for saving graph state, trainable variable values
+for variable in tf.trainable_variables():
+    tf.identity (variable, name="readVariable")
+    tf.assign (variable, tf.placeholder(tf.float32, variable.get_shape(), name="variableValue"), name="resoreVariable")
+
+tf.train.write_graph(session.
