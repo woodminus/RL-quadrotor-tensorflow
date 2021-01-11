@@ -51,4 +51,21 @@ brain = MLP([input_size,], [64, 64, num_actions],
 
 # The optimizer to use. Here we use RMSProp as recommended
 # by the publication
-#optimizer =
+#optimizer = tf.train.RMSPropOptimizer(learning_rate= 0.0001, decay=0.9)
+optimizer = tf.train.RMSPropOptimizer(learning_rate= 0.0001, decay=0.9)
+
+# DiscreteDeepQ object
+current_controller = DiscreteDeepQ(input_size, num_actions, brain, optimizer, session, discount_rate=0.95, target_network_update_rate=0.01, exploration_period=5000, max_experience=10000, store_every_nth=4, train_every_nth=4, summary_writer=journalist)
+
+
+
+#for model based learning
+#state + action
+model_input_size = input_size + num_actions
+#state + reward
+model_output_size = input_size + 1
+model_mlp = MLP([model_input_size,], [128, model_output_size], 
+            [tf.tanh, tf.identity], scope="env_model_mlp")
+
+model_input = tf.placeholder(tf.float32, [None, model_input_size], name="env_model_input")
+model_prediction = tf.identity( model_mlp (model_input), name="env_model_
