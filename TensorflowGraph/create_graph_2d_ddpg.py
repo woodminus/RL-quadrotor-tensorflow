@@ -44,4 +44,26 @@ optimizer = tf.train.AdamOptimizer(learning_rate= 0.0001)
 #optimizer = tf.train.GradientDescentOptimizer(learning_rate= 0.001)
 
 # DiscreteDeepQ object
-current_controller = ContinuousDeepQ(input_size, num_actions, actor, critic, optimizer, session, discount_rate=0.99, target_actor_u
+current_controller = ContinuousDeepQ(input_size, num_actions, actor, critic, optimizer, session, discount_rate=0.99, target_actor_update_rate=0.01, target_critic_update_rate=0.01, exploration_period=5000, max_experience=10000, store_every_nth=4, train_every_nth=4, summary_writer=journalist)
+
+#class ContinuousDeepQ
+#                       observation_size,
+#                       action_size,
+#                       actor,
+#                       critic,
+#                       optimizer,
+#                       session,
+#                       exploration_sigma=0.05,
+#                       exploration_period=1000,
+#                       store_every_nth=5,
+#                       train_every_nth=5,
+#                       minibatch_size=32,
+#                       discount_rate=0.95,
+#                       max_experience=30000,
+#                       target_actor_update_rate=0.01,
+#                       target_critic_update_rate=0.01,
+#                       summary_writer=None
+
+
+
+init_all_vars_op = tf.initialize_variables(tf.all_variables(), name='ini
