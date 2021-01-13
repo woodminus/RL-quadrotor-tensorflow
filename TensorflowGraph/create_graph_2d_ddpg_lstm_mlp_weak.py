@@ -1,18 +1,20 @@
+
 import numpy as np
 import tempfile
 import tensorflow as tf
 
-from tf_rl.controller import ContinuousDeepQ
+from tf_rl.controller import ContinuousDeepQLSTMWeak
 #from tf_rl.simulation import KarpathyGame
 from tf_rl import simulate
-from tf_rl.models import MLP
+from tf_rl.lstm_model import LSTMModel
+from tf_rl.lstm_mlp_model import LSTM_MLP
 
 #tf.ops.reset_default_graph()
 session = tf.Session()
 
 # This little guy will let us run tensorboard
 #      tensorboard --logdir [LOG_DIR]
-journalist = tf.train.SummaryWriter("/tmp")
+journalist = tf.train.SummaryWriter("/home/anton/devel/unity/QuadrocopterHabr/TensorflowLog")
 
 observation_size = 50;
 observations_in_seq = 1;
@@ -21,20 +23,12 @@ input_size = observation_size*observations_in_seq;
 # actions
 num_actions = 2;
 
-#critic = MLP([input_size, num_actions*2], [2048, 1024, 1],
-#            [tf.nn.sigmoid, tf.nn.sigmoid, tf.identity], scope='critic')
-#
-#actor = MLP([input_size,], [2048, 1024, num_actions],
-#            [tf.nn.sigmoid, tf.nn.sigmoid, tf.identity], scope='actor')
+minibatch_size = 128
 
-r = tf.nn.relu
-t = tf.nn.tanh
+#layer_size, layers_count, input_size, output_size, nonlinearity
 
-critic = MLP([input_size, num_actions], [2048, 512, 256, 256, 1],
-            [t, t, t, t, tf.identity], scope='critic')
-
-actor = MLP([input_size,], [2048, 512, 256, 256, num_actions],
-            [t, t, t, t, tf.identity], scope='actor')
+critic = LSTM_MLP(input_size + num_actions*2, 128, [128, 1], [tf.nn.sigmoid, tf.identity], scope='critic')
+actor = LSTM_MLP(input_size, 128, [128, num_actions], [tf.nn.sigmoid, tf.identity], scope='actor')
 
 # The optimizer to use. Here we use RMSProp as recommended
 # by the publication
@@ -44,7 +38,7 @@ optimizer = tf.train.AdamOptimizer(learning_rate= 0.0001)
 #optimizer = tf.train.GradientDescentOptimizer(learning_rate= 0.001)
 
 # DiscreteDeepQ object
-current_controller = ContinuousDeepQ(input_size, num_actions, actor, critic, optimizer, session, discount_rate=0.99, target_actor_update_rate=0.01, target_critic_update_rate=0.01, exploration_period=5000, max_experience=10000, store_every_nth=4, train_every_nth=4, summary_writer=journalist)
+current_controller = ContinuousDeepQLSTMWeak(input_size, num_actions, actor, critic, optimizer, session, discount_rate=0.98, target_actor_update_rate=0.01, target_critic_update_rate=0.01, exploration_period=5000, max_experience=10000, store_every_nth=4, train_every_nth=4, summary_writer=journalist)
 
 #class ContinuousDeepQ
 #                       observation_size,
@@ -75,4 +69,4 @@ for variable in tf.trainable_variables():
     tf.identity (variable, name="readVariable")
     tf.assign (variable, tf.placeholder(tf.float32, variable.get_shape(), name="variableValue"), name="resoreVariable")
 
-tf.train.write_graph(session.graph_def, 'models/', 'graph-2d-ddpg.pb', as_text=False)
+tf.train.write_graph(session.graph_def, 'models/', 'graph-2d-ddpg-lstm-mlp-weak.pb', as_text=False)
