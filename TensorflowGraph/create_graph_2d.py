@@ -1,6 +1,8 @@
+
 import numpy as np
 import tempfile
 import tensorflow as tf
+import os
 
 from tf_rl.controller import DiscreteDeepQ
 #from tf_rl.simulation import KarpathyGame
@@ -12,7 +14,7 @@ session = tf.Session()
 
 # This little guy will let us run tensorboard
 #      tensorboard --logdir [LOG_DIR]
-journalist = tf.train.SummaryWriter("/Users/anton/devel/unity/QuadrocopterHabr/TensorflowLog")
+journalist = tf.train.SummaryWriter("/tmp")
 
 # Brain maps from observation to Q values for different actions.
 # Here it is a done using a multi layer perceptron with 2 hidden
@@ -32,30 +34,37 @@ journalist = tf.train.SummaryWriter("/Users/anton/devel/unity/QuadrocopterHabr/T
 # double motor2powerVal,
 # double motor3powerVal,
 # double motor4powerVal
-observation_size = 4;
+observation_size = 8+32+10;
 observations_in_seq = 1;
 input_size = observation_size*observations_in_seq;
 
 # actions
-num_actions = 3;
+num_actions = 9;
 
 #brain = MLP([input_size,], [5, 5, 5, num_actions], 
 #            [tf.tanh, tf.tanh, tf.tanh, tf.identity])
 #brain = MLP([input_size,], [20, 20, 20, 20, num_actions], 
 #            [tf.tanh, tf.tanh, tf.tanh, tf.tanh, tf.identity])
 
-#brain = MLP([input_size,], [32, 32, 32, 32, 32, num_actions], 
-#            [tf.nn.relu, tf.nn.relu, tf.nn.relu, tf.nn.relu, tf.nn.relu, tf.identity])
-brain = MLP([input_size,], [64, 64, num_actions], 
+#brain = MLP([input_size,], [64, 64, 64, 64, 64, 64, num_actions], 
+#            [tf.nn.relu, tf.nn.relu, tf.nn.relu, tf.nn.relu, tf.nn.relu, tf.nn.relu, tf.identity])
+brain = MLP([input_size,], [512, 96, num_actions], 
             [tf.sigmoid, tf.sigmoid, tf.identity])
+#            [tf.nn.relu, tf.nn.relu, tf.identity])
+#            [tf.nn.relu, tf.nn.relu, tf.nn.relu, tf.identity])
 
 # The optimizer to use. Here we use RMSProp as recommended
 # by the publication
-#optimizer = tf.train.RMSPropOptimizer(learning_rate= 0.0001, decay=0.9)
 optimizer = tf.train.RMSPropOptimizer(learning_rate= 0.0001, decay=0.9)
+#optimizer = tf.train.FtrlOptimizer(learning_rate= 0.0001)
+#optimizer = tf.train.AdamOptimizer(learning_rate= 0.0001)
+#optimizer = tf.train.MomentumOptimizer(learning_rate= 0.0001, momentum=0.1)
+#optimizer = tf.train.AdagradOptimizer(learning_rate= 0.0001)
+#optimizer = tf.train.AdadeltaOptimizer(learning_rate= 0.0001)
+#optimizer = tf.train.GradientDescentOptimizer(learning_rate= 0.0001)
 
 # DiscreteDeepQ object
-current_controller = DiscreteDeepQ(input_size, num_actions, brain, optimizer, session, discount_rate=0.95, target_network_update_rate=0.01, exploration_period=5000, max_experience=10000, store_every_nth=4, train_every_nth=4, summary_writer=journalist)
+current_controller = DiscreteDeepQ(input_size, num_actions, brain, optimizer, session, discount_rate=0.99, target_network_update_rate=0.001, exploration_period=5000, max_experience=10000, store_every_nth=4, train_every_nth=4, summary_writer=journalist)
 
 
 
@@ -89,4 +98,5 @@ for variable in tf.trainable_variables():
     tf.identity (variable, name="readVariable")
     tf.assign (variable, tf.placeholder(tf.float32, variable.get_shape(), name="variableValue"), name="resoreVariable")
 
-tf.train.write_graph(session.graph_def, 'models/', 'graph.pb', as_text=False)
+scriptdir = os.getcwd()
+tf.train.write_graph(session.graph_def, scriptdir + '/models/', 'graph2d.pb', as_text=False)
