@@ -49,4 +49,6 @@ session.run(tf.initialize_all_variables())
 #for saving graph state, trainable variable values
 for variable in tf.trainable_variables():
     tf.identity (variable, name="readVariable")
-    tf.assign (variable, tf.placeholder(tf.float32, varia
+    tf.assign (variable, tf.placeholder(tf.float32, variable.get_shape(), name="variableValue"), name="resoreVariable")
+
+tf.train.write_graph(session.graph_def, 'models/', 'graph-separated-1d.pb', as_text=False)
