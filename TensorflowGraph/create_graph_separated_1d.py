@@ -30,4 +30,23 @@ num_actions = 3;
 brain = SeparatedMLP ([
         MLP([input_size,], [64, 64, 1], [tf.sigmoid, tf.sigmoid, tf.identity], scope="mlp_action1"),
         MLP([input_size,], [64, 64, 1], [tf.sigmoid, tf.sigmoid, tf.identity], scope="mlp_action2"),
-        MLP([
+        MLP([input_size,], [64, 64, 1], [tf.sigmoid, tf.sigmoid, tf.identity], scope="mlp_action3")
+        ])
+
+# The optimizer to use. Here we use RMSProp as recommended
+# by the publication
+optimizer = tf.train.RMSPropOptimizer(learning_rate= 0.0001, decay=0.9)
+
+# DiscreteDeepQ object
+current_controller = DiscreteDeepQ(input_size, num_actions, brain, optimizer, session, discount_rate=0.95, target_network_update_rate=0.005, exploration_period=5000, max_experience=10000, store_every_nth=4, train_every_nth=4, summary_writer=journalist)
+
+
+
+init_all_vars_op = tf.initialize_variables(tf.all_variables(), name='init_all_vars_op')
+
+session.run(tf.initialize_all_variables())
+
+#for saving graph state, trainable variable values
+for variable in tf.trainable_variables():
+    tf.identity (variable, name="readVariable")
+    tf.assign (variable, tf.placeholder(tf.float32, varia
