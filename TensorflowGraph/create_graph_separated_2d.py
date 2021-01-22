@@ -24,4 +24,21 @@ num_actions = 5;
 
 #brain = MLP([input_size,], [5, 5, 5, num_actions], 
 #            [tf.tanh, tf.tanh, tf.tanh, tf.identity])
-#brain = MLP([input_size,], [20,
+#brain = MLP([input_size,], [20, 20, 20, 20, num_actions], 
+#            [tf.tanh, tf.tanh, tf.tanh, tf.tanh, tf.identity])
+
+brain = SeparatedMLP ([
+        MLP([input_size,], [8, 8, 1], [tf.nn.relu, tf.nn.relu, tf.identity], scope="mlp_action1"),
+        MLP([input_size,], [8, 8, 1], [tf.nn.relu, tf.nn.relu, tf.identity], scope="mlp_action2"),
+        MLP([input_size,], [8, 8, 1], [tf.nn.relu, tf.nn.relu, tf.identity], scope="mlp_action3"),
+        MLP([input_size,], [8, 8, 1], [tf.nn.relu, tf.nn.relu, tf.identity], scope="mlp_action4"),
+        MLP([input_size,], [8, 8, 1], [tf.nn.relu, tf.nn.relu, tf.identity], scope="mlp_action5"),
+        ])
+
+# The optimizer to use. Here we use RMSProp as recommended
+# by the publication
+#optimizer = tf.train.RMSPropOptimizer(learning_rate= 0.0001, decay=0.9)
+optimizer = tf.train.RMSPropOptimizer(learning_rate= 0.0001, decay=0.9)
+
+# DiscreteDeepQ object
+current_controller = DiscreteDeepQ(input_size, num_actions, brain, optimizer, session, discount_r
