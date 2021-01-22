@@ -41,4 +41,17 @@ brain = SeparatedMLP ([
 optimizer = tf.train.RMSPropOptimizer(learning_rate= 0.0001, decay=0.9)
 
 # DiscreteDeepQ object
-current_controller = DiscreteDeepQ(input_size, num_actions, brain, optimizer, session, discount_r
+current_controller = DiscreteDeepQ(input_size, num_actions, brain, optimizer, session, discount_rate=0.95, exploration_period=5000, max_experience=10000, store_every_nth=4, train_every_nth=4, summary_writer=journalist)
+
+
+
+init_all_vars_op = tf.initialize_variables(tf.all_variables(), name='init_all_vars_op')
+
+session.run(tf.initialize_all_variables())
+
+#for saving graph state, trainable variable values
+for variable in tf.trainable_variables():
+    tf.identity (variable, name="readVariable")
+    tf.assign (variable, tf.placeholder(tf.float32, variable.get_shape(), name="variableValue"), name="resoreVariable")
+
+tf.train.write_graph(session.graph_def, 'models/', 'graph-separated-2d.pb', as_text=False)
