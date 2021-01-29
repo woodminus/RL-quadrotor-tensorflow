@@ -154,3 +154,172 @@ class ContinuousDeepQ(object):
             # this is equivalent to target = (1-alpha) * target + alpha * source
             update_op = v_target.assign_sub(update_rate * (v_target - v_source))
             target_network_update.append(update_op)
+        return tf.group(*target_network_update)
+
+#    def concat_nn_input(self, input1, input2):
+#        return tf.concat(1, [input1, input2])
+
+#    def add_pow_values(self, values):
+#        return self.concat_nn_input(values, 0.01 * tf.pow(values, [2 for i in range(self.action_size)]))
+
+    def create_variables(self):
+        self.target_actor  = self.actor.copy(scope="target_actor")
+        self.target_critic = self.critic.copy(scope="target_critic")
+
+        # FOR REGULAR ACTION SCORE COMPUTATION
+        with tf.name_scope("taking_action"):
+            # self.observation  = tf.placeholder(tf.float32, (None, self.observation_size), name="observation")
+#            self.actor_val = tf.nn.sigmoid(self.actor(self.observation)) * 40 - 20;
+            self.actor_val = self.actor(self.observation_for_act)
+            self.actor_action = tf.identity(self.actor_val, name="actor_action")
+#            tf.histogram_summary("actions", self.actor_action)
+
+        # FOR PREDICTING TARGET FUTURE REWARDS
+        with tf.name_scope("estimating_future_reward"):
+            # self.next_observation          = tf.placeholder(tf.float32, (None, self.observation_size), name="next_observation")
+            # self.next_observation_mask     = tf.placeholder(tf.float32, (None,), name="next_observation_mask")
+            # self.next_action               = self.target_actor(self.next_observation) # ST
+            self.next_action               = tf.stop_gradient(self.target_actor(self.next_observation)) # ST
+#            print "next action: " + str(self.next_action)
+            # tf.histogram_summary("target_actions", self.next_action)
+            # self.next_value                = self.target_critic([self.next_observation, self.next_action]) # ST
+            self.next_value                = tf.stop_gradient(
+                tf.reshape(
+                    self.target_critic([self.next_observation, self.next_action]),
+                    [-1]
+                )
+            ) # ST
+            # self.rewards                   = tf.placeholder(tf.float32, (None,), name="rewards")
+            self.future_reward             = self.rewards + self.discount_rate *  self.next_observation_mask * self.next_value
+
+        with tf.name_scope("critic_update"):
+            ##### ERROR FUNCTION #####
+            # self.given_action               = tf.placeholder(tf.float32, (None, self.action_size), name="given_action")
+            self.value_given_action         = tf.reshape(
+                self.critic([self.observation, self.given_action]),
+                [-1]
+            )
+            # tf.scalar_summary("value_for_given_action", tf.reduce_mean(self.value_given_action))
+            temp_diff                       = self.value_given_action - self.future_reward
+
+            self.critic_error               = tf.identity(tf.reduce_mean(tf.square(temp_diff)), name='critic_error')
+            ##### OPTIMIZATION #####
+            critic_gradients                       = self.optimizer.compute_gradients(self.critic_error, var_list=self.critic.variables())
+            # Add histograms for gradients.
+            for grad, var in critic_gradients:
+                # tf.histogram_summary('critic_update/' + var.name, var)
+                if grad is not None:
+                    # tf.histogram_summary('critic_update/' + var.name + '/gradients', grad)
+                    pass
+            self.critic_update              = self.optimizer.apply_gradients(critic_gradients, name='critic_train_op')
+            # tf.scalar_summary("critic_error", self.critic_error)
+
+        with tf.name_scope("actor_update"):
+            ##### ERROR FUNCTION #####
+            # self.actor_score = self.critic([self.observation, self.actor_action])
+            self.actor_score = self.critic([self.observation, self.actor(self.observation)])
+
+            ##### OPTIMIZATION #####
+            # here we are maximizing actor score.
+            # only optimize actor variables here, while keeping critic constant
+            actor_gradients = self.optimizer.compute_gradients(tf.reduce_mean(-self.actor_score), var_list=self.actor.variables())
+            # Add histograms for gradients.
+            for grad, var in actor_gradients:
+                # tf.histogram_summary('actor_update/' + var.name, var)
+                if grad is not None:
+                    # tf.histogram_summary('actor_update/' + var.name + '/gradients', grad)
+                    pass
+            self.actor_update              = self.optimizer.apply_gradients(actor_gradients, name='actor_train_op')
+            # tf.scalar_summary("actor_score", tf.reduce_mean(self.actor_score))
+
+        # UPDATE TARGET NETWORK
+        with tf.name_scope("target_network_update"):
+            self.target_actor_update  = ContinuousDeepQ.update_target_network(self.actor, self.target_actor, self.target_actor_update_rate)
+            self.target_critic_update = ContinuousDeepQ.update_target_network(self.critic, self.target_critic, self.target_critic_update_rate)
+            self.update_all_targets = tf.group(self.target_actor_update, self.target_critic_update, name='target_networks_update')
+
+        # self.summarize = tf.merge_all_summaries()
+        self.no_op1 = tf.no_op()
+
+    def action(self, observation, disable_exploration=False):
+        """Given observation returns the action that should be chosen using
+        DeepQ learning strategy. Does not backprop."""
+        assert len(observation.shape) == 1, \
+                "Action is performed based on single observation."
+
+        self.actions_executed_so_far += 1
+        noise_sigma = ContinuousDeepQ.linear_annealing(self.actions_executed_so_far,
+                                                       self.exploration_period,
+                                                       1.0,
+                                                       self.exploration_sigma)
+
+        action = self.s.run(self.actor_action, {self.observation: observation[np.newaxis,:]})[0]
+        if not disable_exploration:
+            action += np.random.normal(0, noise_sigma, size=action.shape)
+            action = np.clip(action, -1., 1.)
+
+        return action
+
+    def store(self, observation, action, reward, newobservation):
+        """Store experience, where starting with observation and
+        execution action, we arrived at the newobservation and got thetarget_network_update
+        reward reward
+        If newstate is None, the state/action pair is assumed to be terminal
+        """
+        if self.number_of_times_store_called % self.store_every_nth == 0:
+            self.experience.append((observation, action, reward, newobservation))
+            if len(self.experience) > self.max_experience:
+                self.experience.popleft()
+        self.number_of_times_store_called += 1
+
+    def training_step(self):
+        """Pick a self.minibatch_size exeperiences from reply buffer
+        and backpropage the value function.
+        """
+        if self.number_of_times_train_called % self.train_every_nth == 0:
+            if len(self.experience) <  self.minibatch_size:
+                return
+
+            # sample experience (need to be a twoliner, because deque...)
+            samples   = random.sample(range(len(self.experience)), self.minibatch_size)
+            samples   = [self.experience[i] for i in samples]
+
+            # bach states
+            states         = np.empty((len(samples), self.observation_size))
+            newstates      = np.empty((len(samples), self.observation_size))
+            actions        = np.zeros((len(samples), self.action_size))
+
+            newstates_mask = np.empty((len(samples),))
+            rewards        = np.empty((len(samples),))
+
+            for i, (state, action, reward, newstate) in enumerate(samples):
+                states[i] = state
+                actions[i] = action
+                rewards[i] = reward
+                if newstate is not None:
+                    newstates[i] = newstate
+                    newstates_mask[i] = 1.
+                else:
+                    newstates[i] = 0
+                    newstates_mask[i] = 0.
+
+            _, _, summary_str = self.s.run([
+                self.actor_update,
+                self.critic_update,
+                self.summarize if self.iteration % 100 == 0 else self.no_op1,
+            ], {
+                self.observation:            states,
+                self.next_observation:       newstates,
+                self.next_observation_mask:  newstates_mask,
+                self.given_action:           actions,
+                self.rewards:                rewards,
+            })
+
+            self.s.run(self.update_all_targets)
+
+            if self.summary_writer is not None and summary_str is not None:
+                self.summary_writer.add_summary(summary_str, self.iteration)
+
+            self.iteration += 1
+
+        self.number_of_times_train_called += 1
