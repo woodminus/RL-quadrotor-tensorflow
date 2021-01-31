@@ -23,4 +23,25 @@ class DiscreteDeepQ(object):
                        train_every_nth=5,
                        minibatch_size=32,
                        discount_rate=0.95,
-           
+                       max_experience=30000,
+                       target_network_update_rate=0.01,
+                       summary_writer=None):
+        # Этот большой комментарий я просто переведу ниже
+        """Initialized the Deepq object.
+
+        Based on:
+            https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf
+
+        Parameters
+        -------
+        observation_size : int
+            length of the vector passed as observation
+        num_actions : int
+            number of actions that the model can execute
+        observation_to_actions: dali model
+            model that implements activate function
+            that can take in observation vector or a batch
+            and returns scores (of unbounded values) for each
+            action for each observation.
+            input shape:  [batch_size, observation_size]
+            output shape: [batch_size, num_ac
