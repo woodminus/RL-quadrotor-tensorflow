@@ -44,4 +44,23 @@ class DiscreteDeepQ(object):
             and returns scores (of unbounded values) for each
             action for each observation.
             input shape:  [batch_size, observation_size]
-            output shape: [batch_size, num_ac
+            output shape: [batch_size, num_actions]
+        optimizer: tf.solver.*
+            optimizer for prediction error
+        session: tf.Session
+            session on which to execute the computation
+        random_action_probability: float (0 to 1)
+        exploration_period: int
+            probability of choosing a random
+            action (epsilon form paper) annealed linearly
+            from 1 to random_action_probability over
+            exploration_period
+        store_every_nth: int
+            to further decorrelate samples do not all
+            transitions, but rather every nth transition.
+            For example if store_every_nth is 5, then
+            only 20% of all the transitions is stored.
+        train_every_nth: int
+            normally training_step is invoked every
+            time action is executed. Depending on the
+            set
