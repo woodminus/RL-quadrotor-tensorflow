@@ -63,4 +63,23 @@ class DiscreteDeepQ(object):
         train_every_nth: int
             normally training_step is invoked every
             time action is executed. Depending on the
-            set
+            setup that might be too often. When this
+            variable is set set to n, then only every
+            n-th time training_step is called will
+            the training procedure actually be executed.
+        minibatch_size: int
+            number of state,action,reward,newstate
+            tuples considered during experience reply
+        dicount_rate: float (0 to 1)
+            how much we care about future rewards.
+        max_experience: int
+            maximum size of the reply buffer
+        target_network_update_rate: float
+            how much to update target network after each
+            iteration. Let's call target_network_update_rate
+            alpha, target network T, and network N. Every
+            time N gets updated we execute:
+                T = (1-alpha)*T + alpha*N
+        summary_writer: tf.train.SummaryWriter
+            writer to log metrics
+   
