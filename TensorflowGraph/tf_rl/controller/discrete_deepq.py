@@ -82,4 +82,30 @@ class DiscreteDeepQ(object):
                 T = (1-alpha)*T + alpha*N
         summary_writer: tf.train.SummaryWriter
             writer to log metrics
-   
+        """
+
+        """Инициализация Deepq
+
+        Основано на:
+            https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf
+
+        Параметры
+        -------
+        observation_size : int
+            длина вектора входных данных (этот вектор
+            будем называть наблюдением или состоянием)
+            
+        num_actions : int
+            количество возможных действий или же
+            длина вектора выходных данных нейросети
+            
+        observation_to_actions: dali model
+            модель (в нашем случае нейросеть),
+            которая принимает наблюдение или набор наблюдений
+            и возвращает оценку очками каждого действия или
+            набор оценок для каждого действия каждого из наблюдений
+            входной размер: матрица [batch_size, observation_size]
+            выходной размер: матрица [batch_size, num_actions]
+            
+        optimizer: tf.solver.*
+            алгорит
