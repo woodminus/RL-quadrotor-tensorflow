@@ -173,4 +173,26 @@ class DiscreteDeepQ(object):
         summary_writer: tf.train.SummaryWriter
             запись логов
         """
-  
+        
+        
+        # memorize arguments
+        self.observation_size          = observation_size
+        self.num_actions               = num_actions
+
+        self.q_network                 = observation_to_actions
+        self.optimizer                 = optimizer
+        self.s                         = session
+
+        self.random_action_probability = random_action_probability
+        self.exploration_period        = exploration_period
+        self.store_every_nth           = store_every_nth
+        self.train_every_nth           = train_every_nth
+        self.minibatch_size            = minibatch_size
+        self.discount_rate             = tf.constant(discount_rate)
+        self.max_experience            = max_experience
+        self.target_network_update_rate = \
+                tf.constant(target_network_update_rate)
+
+        # deepq state
+        self.actions_executed_so_far = 0
+        self
