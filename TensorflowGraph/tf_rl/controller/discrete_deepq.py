@@ -223,4 +223,19 @@ class DiscreteDeepQ(object):
         # создание нейросети T копированием из исходной нейросети N
         self.target_q_network    = self.q_network.copy(scope="target_network")
 
-     
+        # расчет управляющего действия
+        # FOR REGULAR ACTION SCORE COMPUTATION
+        with tf.name_scope("taking_action"):
+            # входные данные вектора состояния
+            self.observation        = tf.placeholder(tf.float32, (None, self.observation_size), name="observation")
+            # расчитать очки оценки полезности каждого действия
+            self.action_scores      = tf.identity(self.q_network(self.observation), name="action_scores")
+            tf.histogram_summary("action_scores", self.action_scores)
+            # взять действие с максимальным количеством очков
+            self.predicted_actions  = tf.argmax(self.action_scores, dimension=1, name="predicted_actions")
+
+        # расчет будущей пользы
+        with tf.name_scope("estimating_future_rewards"):
+            # FOR PREDICTING TARGET FUTURE REWARDS
+            # входной параметр - будущие состояния
+            self.next
