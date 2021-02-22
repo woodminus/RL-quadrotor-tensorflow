@@ -195,4 +195,32 @@ class DiscreteDeepQ(object):
 
         # deepq state
         self.actions_executed_so_far = 0
-        self
+        self.experience = deque()
+
+        self.iteration = 0
+        self.summary_writer = summary_writer
+
+        self.number_of_times_store_called = 0
+        self.number_of_times_train_called = 0
+
+        self.create_variables()
+
+    # расчет вероятности случайного действия
+    # с учетом уменьшения с итерациями
+    # (линейный отжиг)
+    def linear_annealing(self, n, total, p_initial, p_final):
+        """Linear annealing between p_initial and p_final
+        over total steps - computes value at step n"""
+        if n >= total:
+            return p_final
+        else:
+            return p_initial - (n * (p_initial - p_final)) / (total)
+
+    # создание графов TensorFlow для
+    # для расчета управляющего действия
+    # и реализации Q-learning
+    def create_variables(self):
+        # создание нейросети T копированием из исходной нейросети N
+        self.target_q_network    = self.q_network.copy(scope="target_network")
+
+     
