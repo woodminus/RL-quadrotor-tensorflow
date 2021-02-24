@@ -238,4 +238,14 @@ class DiscreteDeepQ(object):
         with tf.name_scope("estimating_future_rewards"):
             # FOR PREDICTING TARGET FUTURE REWARDS
             # входной параметр - будущие состояния
-            self.next
+            self.next_observation          = tf.placeholder(tf.float32, (None, self.observation_size), name="next_observation")
+            # входной параметр - маски будущих состояний
+            self.next_observation_mask     = tf.placeholder(tf.float32, (None,), name="next_observation_mask")
+            # оценки полезности
+            self.next_action_scores        = tf.stop_gradient(self.target_q_network(self.next_observation))
+            tf.histogram_summary("target_action_scores", self.next_action_scores)
+            # входной параметр - награды
+            self.rewards                   = tf.placeholder(tf.float32, (None,), name="rewards")
+            # взять максимальные оценки полезностей действий
+            target_values                  = tf.identity(tf.reduce_max(self.next_action_scores, reduction_indices=[1,]) * self.next_observation_mask, name="target_values")
+            # r + DF * MAX(Q,s
