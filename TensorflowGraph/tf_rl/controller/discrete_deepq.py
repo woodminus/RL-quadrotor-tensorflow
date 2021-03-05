@@ -273,4 +273,20 @@ class DiscreteDeepQ(object):
             #gradients                       = self.optimizer.compute_gradients(tf.cond(tf.is_nan(self.prediction_error), get_zero, get_perror))
             for i, (grad, var) in enumerate(gradients):
                 if grad is not None:
-                    gradients[i
+                    gradients[i] = (tf.clip_by_norm(grad, 5), var)
+            # Add histograms for gradients.
+            for grad, var in gradients:
+                tf.histogram_summary(var.name, var)
+                if grad is not None:
+                    tf.histogram_summary(var.name + '/gradients', grad)
+            # второй шаг - оптимизация параметров нейросети
+            self.train_op                   = self.optimizer.apply_gradients(gradients, name="train_op")
+
+        # то самое место где настраивается сеть T
+        # T = (1-alpha)*T + alpha*N
+        # UPDATE TARGET NETWORK
+        with tf.name_scope("target_network_update"):
+            self.target_network_update = []
+            for v_source, v_target in zip(self.q_network.variables(), self.target_q_network.variables()):
+                # this is equivalent to target = (1-alpha) * target + alpha * source
+                update_op = v_target.assign
