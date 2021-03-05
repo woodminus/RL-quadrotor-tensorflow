@@ -248,4 +248,17 @@ class DiscreteDeepQ(object):
             self.rewards                   = tf.placeholder(tf.float32, (None,), name="rewards")
             # взять максимальные оценки полезностей действий
             target_values                  = tf.identity(tf.reduce_max(self.next_action_scores, reduction_indices=[1,]) * self.next_observation_mask, name="target_values")
-            # r + DF * MAX(Q,s
+            # r + DF * MAX(Q,s) см статью о Q-learning в википедии
+            #self.future_rewards            = self.rewards + self.discount_rate * target_values
+            self.future_rewards            = tf.identity(self.rewards + self.discount_rate * target_values, name="future_rewards")
+
+        # обученте сети N 
+        with tf.name_scope("q_value_precition"):
+            # FOR PREDICTION ERROR
+            # входной параметр маски действий в наборе обучающих примеров
+            self.action_mask                = tf.placeholder(tf.float32, (None, self.num_actions), name="action_mask")
+            # расчет полезностей действий набора обучающих примеров
+            self.masked_action_scores       = tf.reduce_sum(self.action_scores * self.action_mask, reduction_indices=[1,], name="masked_action_scores")
+            # разности текущих полезностей и будущих
+            # - (r + DF * MAX(Q,s) — Q[s',a'])
+            #temp_diff                       = self.masked_action_scores - self
