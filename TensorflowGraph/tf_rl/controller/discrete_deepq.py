@@ -261,4 +261,16 @@ class DiscreteDeepQ(object):
             self.masked_action_scores       = tf.reduce_sum(self.action_scores * self.action_mask, reduction_indices=[1,], name="masked_action_scores")
             # разности текущих полезностей и будущих
             # - (r + DF * MAX(Q,s) — Q[s',a'])
-            #temp_diff                       = self.masked_action_scores - self
+            #temp_diff                       = self.masked_action_scores - self.future_rewards
+            temp_diff                       = tf.identity(self.masked_action_scores - self.future_rewards, name="temp_diff")
+            # ключевой момент обучения сети
+            # RMSProp минимизирует среднее от вышеуказанных разностей
+            self.prediction_error           = tf.reduce_mean(tf.square(temp_diff), name="prediction_error")
+            # работа RMSProp, первый шаг - вычисление градиентов
+            gradients                       = self.optimizer.compute_gradients(self.prediction_error)
+            #def get_zero(): return tf.constant(0.0)
+            #def get_perror(): return self.prediction_error
+            #gradients                       = self.optimizer.compute_gradients(tf.cond(tf.is_nan(self.prediction_error), get_zero, get_perror))
+            for i, (grad, var) in enumerate(gradients):
+                if grad is not None:
+                    gradients[i
