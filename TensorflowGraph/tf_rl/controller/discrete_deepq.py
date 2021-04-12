@@ -328,4 +328,23 @@ class DiscreteDeepQ(object):
         execution action, we arrived at the newobservation and got thetarget_network_update
         reward reward
 
-        If newstate is None, the state/action pair
+        If newstate is None, the state/action pair is assumed to be terminal
+        """
+        if self.number_of_times_store_called % self.store_every_nth == 0:
+            self.experience.append((observation, action, reward, newobservation))
+            if len(self.experience) > self.max_experience:
+                self.experience.popleft()
+        self.number_of_times_store_called += 1
+
+    # шаг обучения
+    def training_step(self):
+        """Pick a self.minibatch_size exeperiences from reply buffer
+        and backpropage the value function.
+        """
+        if self.number_of_times_train_called % self.train_every_nth == 0:
+            if len(self.experience) <  self.minibatch_size:
+                return
+
+            # из всего сохраненного опыта случайно выбираем
+            # пачку из minibatch_size обучающих примеров
+            # sample experience.
