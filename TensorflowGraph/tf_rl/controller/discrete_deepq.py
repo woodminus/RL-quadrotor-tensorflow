@@ -348,3 +348,23 @@ class DiscreteDeepQ(object):
             # из всего сохраненного опыта случайно выбираем
             # пачку из minibatch_size обучающих примеров
             # sample experience.
+            samples   = random.sample(range(len(self.experience)), self.minibatch_size)
+            samples   = [self.experience[i] for i in samples]
+
+            # представляем обучающие примеры
+            # в нужном виде
+            # bach states
+            states         = np.empty((len(samples), self.observation_size))
+            newstates      = np.empty((len(samples), self.observation_size))
+            action_mask    = np.zeros((len(samples), self.num_actions))
+
+            newstates_mask = np.empty((len(samples),))
+            rewards        = np.empty((len(samples),))
+
+            for i, (state, action, reward, newstate) in enumerate(samples):
+                states[i] = state
+                action_mask[i] = 0
+                action_mask[i][action] = 1
+                rewards[i] = reward
+                if newstate is not None:
+                    newstat
