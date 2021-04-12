@@ -289,4 +289,24 @@ class DiscreteDeepQ(object):
             self.target_network_update = []
             for v_source, v_target in zip(self.q_network.variables(), self.target_q_network.variables()):
                 # this is equivalent to target = (1-alpha) * target + alpha * source
-                update_op = v_target.assign
+                update_op = v_target.assign_sub(self.target_network_update_rate * (v_target - v_source))
+                self.target_network_update.append(update_op)
+            self.target_network_update = tf.group(*self.target_network_update, name="target_network_update")
+
+        # summaries 
+        tf.scalar_summary("prediction_error", self.prediction_error)
+
+        self.summarize = tf.merge_all_summaries()
+        self.no_op1    = tf.no_op()
+
+    # управление
+    def action(self, observation):
+        """Given observation returns the action that should be chosen using
+        DeepQ learning strategy. Does not backprop."""
+        assert len(observation.shape) == 1, \
+                "Action is performed based on single observation."
+
+        self.actions_executed_so_far += 1
+        # расчет вероятности случайного действия
+        exploration_p = self.linear_annealing(self.actions_executed_so_far,
+                    
