@@ -309,4 +309,23 @@ class DiscreteDeepQ(object):
         self.actions_executed_so_far += 1
         # расчет вероятности случайного действия
         exploration_p = self.linear_annealing(self.actions_executed_so_far,
-                    
+                                              self.exploration_period,
+                                              1.0,
+                                              self.random_action_probability)
+
+        if random.random() < exploration_p:
+            # случайное действие
+            return random.randint(0, self.num_actions - 1)
+        else:
+            # действие выбранное нейросетью
+            return self.s.run(self.predicted_actions, {self.observation: observation[np.newaxis,:]})[0]
+
+    # сохранение обучающего примера
+    # обучающий примеры берутся из действий нейросети
+    # во время управления
+    def store(self, observation, action, reward, newobservation):
+        """Store experience, where starting with observation and
+        execution action, we arrived at the newobservation and got thetarget_network_update
+        reward reward
+
+        If newstate is None, the state/action pair
