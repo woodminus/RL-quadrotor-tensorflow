@@ -367,4 +367,27 @@ class DiscreteDeepQ(object):
                 action_mask[i][action] = 1
                 rewards[i] = reward
                 if newstate is not None:
-                    newstat
+                    newstates[i] = newstate
+                    newstates_mask[i] = 1
+                else:
+                    newstates[i] = 0
+                    newstates_mask[i] = 0
+
+
+            calculate_summaries = self.iteration % 100 == 0 and \
+                    self.summary_writer is not None
+
+            # запускаем вычисления
+            # сначала считаем ошибку сети
+            # потом запускаем оптимизацию сети
+            # далее собираем статистику (необязательный шаг
+            # нужный для построения графиков обучения)
+            cost, _, summary_str = self.s.run([
+                self.prediction_error,
+                self.train_op,
+                self.summarize if calculate_summaries else self.no_op1,
+            ], {
+                self.observation:            states,
+                self.next_observation:       newstates,
+                self.next_observation_mask:  newstates_mask,
+            
