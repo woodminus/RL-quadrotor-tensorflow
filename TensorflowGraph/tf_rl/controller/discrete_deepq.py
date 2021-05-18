@@ -390,4 +390,16 @@ class DiscreteDeepQ(object):
                 self.observation:            states,
                 self.next_observation:       newstates,
                 self.next_observation_mask:  newstates_mask,
-            
+                self.action_mask:            action_mask,
+                self.rewards:                rewards,
+            })
+
+            # подстраиваем нейросеть Т
+            self.s.run(self.target_network_update)
+
+            if calculate_summaries:
+                self.summary_writer.add_summary(summary_str, self.iteration)
+
+            self.iteration += 1
+
+        self.number_of_times_train_called += 1
