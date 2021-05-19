@@ -32,4 +32,18 @@ class CNN(object):
     def gen_model(self, model_input, reuse=True):
         
         if (isinstance(model_input, list)):
-            model_input = tf.concat (1, [model_input[0], model_input[1
+            model_input = tf.concat (1, [model_input[0], model_input[1]])
+
+        with tf.variable_scope(self.scope, reuse=reuse) as sc:
+            
+            cnn_input = tf.slice (model_input, [0, 0], [-1, self.cnn_input_flatten_size])
+            mlp_input_addition = tf.slice (model_input, [0, self.cnn_input_flatten_size], [-1, self.addition_size])
+            
+            layerI = 0
+            cnn_layer_input = tf.reshape (cnn_input, (-1, self.cnn_input_size[0], self.cnn_input_size[1], 1))
+#            cnn_layer_input = tf.expand_dims(tf.expand_dims(cnn_input, 1), 3)
+            for W, s, n, p in zip(self.cnn_weights, self.cnn_strides, self.cnn_nonlinearities, self.cnn_maxpooling):
+                
+                W_initializer = tf.truncated_normal_initializer ()
+                W_var = tf.get_variable("cnn_layer_"+str(layerI)+"_w", W, initializer=W_initializer)
+                cnn_layer_input = tf.nn.conv2d (cnn_layer_i
