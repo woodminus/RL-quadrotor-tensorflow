@@ -61,4 +61,23 @@ class CNN(object):
             mlp_input_from_cnn = tf.reshape(cnn_layer_input, [-1, self.mlp_input-self.addition_size])
             mlp_input_value = tf.concat (1, [mlp_input_from_cnn, mlp_input_addition])
 #            print ("mlp_input_value: " + str(mlp_input_value))
-            mlp = MLP ([self.mlp_input,], self.mlp_hiddens, self.mlp_n
+            mlp = MLP ([self.mlp_input,], self.mlp_hiddens, self.mlp_nonlinearities, "mlp")
+#            print ("mlp: " + str(mlp (mlp_input_value)))
+            
+            return mlp (mlp_input_value)
+        
+    def __call__(self, xs):
+        return self.gen_model (xs)
+
+    def variables(self):
+        return self.model_variables
+
+    def copy(self, scope=None):
+        scope = scope or self.scope + "_copy"
+        print ("copy " + scope)
+        with tf.variable_scope(scope) as sc:
+            for v in self.variables():
+                print ("bn: " + base_name2(v) + " " + v.name)
+                tf.get_variable(base_name2(v), v.get_shape(), initializer=lambda x,dtype=tf.float32, partition_info=None: v.initialized_value())
+            sc.reuse_variables()
+            return CNN(self.cnn_input_size, self.addition_size, self.cnn_weights, self.cnn_strides, self.cnn_maxpooling, self.cnn_nonlinearities, self.mlp_input, self.mlp_hiddens, self.mlp_nonlinearities, scope=sc, reuse=
