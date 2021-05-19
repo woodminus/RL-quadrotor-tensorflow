@@ -80,4 +80,4 @@ class CNN(object):
                 print ("bn: " + base_name2(v) + " " + v.name)
                 tf.get_variable(base_name2(v), v.get_shape(), initializer=lambda x,dtype=tf.float32, partition_info=None: v.initialized_value())
             sc.reuse_variables()
-            return CNN(self.cnn_input_size, self.addition_size, self.cnn_weights, self.cnn_strides, self.cnn_maxpooling, self.cnn_nonlinearities, self.mlp_input, self.mlp_hiddens, self.mlp_nonlinearities, scope=sc, reuse=
+            return CNN(self.cnn_input_size, self.addition_size, self.cnn_weights, self.cnn_strides, self.cnn_maxpooling, self.cnn_nonlinearities, self.mlp_input, self.mlp_hiddens, self.mlp_nonlinearities, scope=sc, reuse=True)
