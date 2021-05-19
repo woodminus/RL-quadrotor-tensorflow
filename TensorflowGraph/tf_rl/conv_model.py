@@ -46,4 +46,19 @@ class CNN(object):
                 
                 W_initializer = tf.truncated_normal_initializer ()
                 W_var = tf.get_variable("cnn_layer_"+str(layerI)+"_w", W, initializer=W_initializer)
-                cnn_layer_input = tf.nn.conv2d (cnn_layer_i
+                cnn_layer_input = tf.nn.conv2d (cnn_layer_input, W_var, strides=s, padding='VALID')
+                
+                b_initializer = tf.constant_initializer ()
+                b_var = tf.get_variable("cnn_layer_"+str(layerI)+"_b", (W[3]), initializer=b_initializer)
+                cnn_layer_input = tf.nn.bias_add(cnn_layer_input, b_var)
+                
+                cnn_layer_input = n (cnn_layer_input)
+                
+                cnn_layer_input = tf.nn.max_pool(cnn_layer_input, ksize=[1, p[0], p[1], 1], strides=[1, p[0], p[1], 1], padding='SAME')
+                
+                layerI += 1
+            
+            mlp_input_from_cnn = tf.reshape(cnn_layer_input, [-1, self.mlp_input-self.addition_size])
+            mlp_input_value = tf.concat (1, [mlp_input_from_cnn, mlp_input_addition])
+#            print ("mlp_input_value: " + str(mlp_input_value))
+            mlp = MLP ([self.mlp_input,], self.mlp_hiddens, self.mlp_n
