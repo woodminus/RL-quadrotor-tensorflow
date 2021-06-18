@@ -78,4 +78,28 @@ class LSTMSteppedModel(object):
             
             self.model_variables = [v for v in tf.trainable_variables()
                     if v.name.startswith(vs.name)]
-            for v in self.model_variable
+            for v in self.model_variables:
+                print "LSTMSteppedModel v: " + v.name
+                
+    def calc (self, xs):
+        val, state = tf.nn.dynamic_rnn(tf.nn.rnn_cell.MultiRNNCell(self.layers, state_is_tuple=True), xs, dtype=tf.float32)
+        
+        return val
+    
+#        val = tf.transpose(val, [1, 0, 2])
+#        return tf.gather(val, int(val.get_shape()[0]) - 1)
+
+    def __call__(self, xs):
+        with tf.variable_scope(self.scope, reuse=True) as vs:
+            return self.calc (xs)
+
+    def variables(self):
+        return self.model_variables
+
+    def copy(self, scope=None):
+        scope = scope or self.scope + "_copy"
+        print "copy " + scope
+        with tf.variable_scope(scope) as sc:
+            for v in self.variables():
+                print "LSTMSteppedModel bn: " + base_name2(v) + " " + v.name
+                tf.get_variable(base_name2(v), v.get_shape(), initializer=lambda x,dtype=tf.float3
