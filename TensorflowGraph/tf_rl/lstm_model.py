@@ -102,4 +102,6 @@ class LSTMSteppedModel(object):
         with tf.variable_scope(scope) as sc:
             for v in self.variables():
                 print "LSTMSteppedModel bn: " + base_name2(v) + " " + v.name
-                tf.get_variable(base_name2(v), v.get_shape(), initializer=lambda x,dtype=tf.float3
+                tf.get_variable(base_name2(v), v.get_shape(), initializer=lambda x,dtype=tf.float32: v.initialized_value())
+            sc.reuse_variables()
+        return LSTMSteppedModel(self.input_size, self.layer_size, self.layer_count, self.steps_count, scope=sc, needReuseVariables=False)
