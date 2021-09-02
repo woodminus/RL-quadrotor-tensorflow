@@ -57,4 +57,33 @@ class LSTMMultiModel(object):
         with tf.variable_scope(scope) as sc:
             for v in self.variables():
                 print "bn: " + base_name2(v) + " " + v.name
-                tf.
+                tf.get_variable(base_name2(v), v.get_shape(), initializer=lambda x,dtype=tf.float32: v.initialized_value())
+            sc.reuse_variables()
+            return LSTMModel(self.layer_size, self.layers_count, self.input_size, self.output_size, self.nonlinearity, scope=sc)
+
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+#class LSTMModel(object):
+#    def __init__(self, time_size, layer_size, layers_count, input_size, output_size, minibatch_size, nonlinearity, scope=None):
+#
+##        self.input_data = tf.constant(0, dtype=tf.float32, shape=[minibatch_size, time_size, output_size])
+##target = tf.placeholder(tf.float32, [None, 18])
+#
+#        self.time_size = time_size
+#        self.layer_size = layer_size
+#        self.layers_count = la
