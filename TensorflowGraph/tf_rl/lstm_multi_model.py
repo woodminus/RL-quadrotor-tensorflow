@@ -108,4 +108,19 @@ class LSTMMultiModel(object):
 #    def get_lstm(self, input_data):
 #        with tf.variable_scope(self.scope) as vs:
 #
-#            cell = tf.nn.rnn_cell.LSTMCell(self.layer_size, state_
+#            cell = tf.nn.rnn_cell.LSTMCell(self.layer_size, state_is_tuple=True)
+#            multi_cell = tf.nn.rnn_cell.MultiRNNCell([cell] * self.layers_count, state_is_tuple=True)
+#            val, state = tf.nn.dynamic_rnn(multi_cell, input_data, dtype=tf.float32)
+#
+#            val = tf.transpose(val, [1, 0, 2])
+#            last = tf.gather(val, int(val.get_shape()[0]) - 1)
+#
+#            w = tf.truncated_normal([self.layer_size, self.output_size]);
+#            weight = tf.get_variable ("weight", w.get_shape(), initializer=lambda x,dtype=tf.float32: w)
+##            weight = tf.Variable(tf.truncated_normal([self.layer_size, self.output_size]), name="weight")
+#            b = tf.constant(0.1, shape=[self.output_size])
+#            bias = tf.get_variable ("bias", b.get_shape(), initializer=lambda x,dtype=tf.float32: b)
+##            bias = tf.Variable(tf.constant(0.1, shape=[self.output_size]), name="bias")
+#
+#            
+#            return (last,
