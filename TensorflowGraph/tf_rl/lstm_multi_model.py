@@ -86,4 +86,26 @@ class LSTMMultiModel(object):
 #
 #        self.time_size = time_size
 #        self.layer_size = layer_size
-#        self.layers_count = la
+#        self.layers_count = layers_count
+#        self.input_size = input_size
+#        self.output_size = output_size
+#        self.minibatch_size = minibatch_size
+#        self.nonlinearity = nonlinearity
+#        self.scope = scope or "LSTM"
+#
+#        with tf.variable_scope(self.scope) as vs:
+#            self.fake_input_data = tf.get_variable("fake_lstm_input", (minibatch_size, time_size, input_size), dtype=tf.float32, trainable=False)
+#
+#        self.get_lstm (self.fake_input_data)
+#
+#        with tf.variable_scope(self.scope) as vs:
+#            vs.reuse_variables()
+#            self.model_variables = [v for v in tf.trainable_variables()
+#                    if v.name.startswith(vs.name)]
+#            for v in self.model_variables:
+#                print "v: " + v.name
+#
+#    def get_lstm(self, input_data):
+#        with tf.variable_scope(self.scope) as vs:
+#
+#            cell = tf.nn.rnn_cell.LSTMCell(self.layer_size, state_
