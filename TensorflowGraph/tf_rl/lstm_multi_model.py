@@ -123,4 +123,22 @@ class LSTMMultiModel(object):
 ##            bias = tf.Variable(tf.constant(0.1, shape=[self.output_size]), name="bias")
 #
 #            
-#            return (last,
+#            return (last, weight, bias)
+#
+#    def __call__(self, xs):
+#        last, weight, bias = self.get_lstm (xs)
+#        return self.nonlinearity(tf.matmul(last, weight) + bias)
+#
+#    def variables(self):
+#        return self.model_variables
+#
+#    def copy(self, scope=None):
+#        scope = scope or self.scope + "_copy"
+#        print "copy " + scope
+#        with tf.variable_scope(scope) as sc:
+#            fake_input_data = tf.get_variable("fake_lstm_input", (self.minibatch_size, self.time_size, self.input_size), dtype=tf.float32, trainable=False)
+#            for v in self.variables():
+#                print "bn: " + base_name2(v) + " " + v.name
+#                tf.get_variable(base_name2(v), v.get_shape(), initializer=lambda x,dtype=tf.float32: v.initialized_value())
+#            sc.reuse_variables()
+#            return LSTMModel(self.time_size, self.layer_size, self.laye
