@@ -141,4 +141,4 @@ class LSTMMultiModel(object):
 #                print "bn: " + base_name2(v) + " " + v.name
 #                tf.get_variable(base_name2(v), v.get_shape(), initializer=lambda x,dtype=tf.float32: v.initialized_value())
 #            sc.reuse_variables()
-#            return LSTMModel(self.time_size, self.layer_size, self.laye
+#            return LSTMModel(self.time_size, self.layer_size, self.layers_count, self.input_size, self.output_size, self.minibatch_size, self.nonlinearity, scope=sc)
