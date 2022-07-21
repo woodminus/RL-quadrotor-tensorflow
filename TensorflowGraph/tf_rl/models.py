@@ -64,4 +64,26 @@ class MLP(object):
                 self.input_layer = Layer(input_sizes, hiddens[0], scope="input_layer")
                 self.layers = []
 
-                for l_idx, (h_from, h_to) in enumerate(zip(hiddens[:
+                for l_idx, (h_from, h_to) in enumerate(zip(hiddens[:-1], hiddens[1:])):
+                    self.layers.append(Layer(h_from, h_to, scope="hidden_layer_%d" % (l_idx,)))
+
+    def __call__(self, xs):
+        if type(xs) != list:
+            xs = [xs]
+        with tf.variable_scope(self.scope):
+            hidden = self.input_nonlinearity(self.input_layer(xs))
+            for layer, nonlinearity in zip(self.layers, self.layer_nonlinearities):
+                hidden = nonlinearity(layer(hidden))
+#                hidden = tf.nn.dropout(nonlinearity(layer(hidden)), 0.5)
+            return hidden
+
+    def variables(self):
+        res = self.input_layer.variables()
+        for layer in self.layers:
+            res.extend(layer.variables())
+        return res
+
+    def copy(self, scope=None):
+        scope = scope or self.scope + "_copy"
+        nonlinearities = [self.input_nonlinearity] + self.layer_nonlinearities
+        given_layers = [self.input_layer.copy(scope+"_
