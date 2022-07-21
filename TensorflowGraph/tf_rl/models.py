@@ -44,4 +44,24 @@ class Layer(object):
             for v in self.variables():
                 tf.get_variable(base_name(v), v.get_shape(), initializer=lambda x,dtype=tf.float32, partition_info=None: v.initialized_value())
             sc.reuse_variables()
-            return Layer(self.input_sizes, self.output_size
+            return Layer(self.input_sizes, self.output_size, scope=sc)
+
+class MLP(object):
+    def __init__(self, input_sizes, hiddens, nonlinearities, scope=None, given_layers=None):
+        self.input_sizes = input_sizes
+        self.hiddens = hiddens
+        self.input_nonlinearity, self.layer_nonlinearities = nonlinearities[0], nonlinearities[1:]
+        self.scope = scope or "MLP"
+
+        assert len(hiddens) == len(nonlinearities), \
+                "Number of hiddens must be equal to number of nonlinearities"
+
+        with tf.variable_scope(self.scope):
+            if given_layers is not None:
+                self.input_layer = given_layers[0]
+                self.layers      = given_layers[1:]
+            else:
+                self.input_layer = Layer(input_sizes, hiddens[0], scope="input_layer")
+                self.layers = []
+
+                for l_idx, (h_from, h_to) in enumerate(zip(hiddens[:
