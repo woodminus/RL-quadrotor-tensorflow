@@ -18,4 +18,10 @@ cd Tensorflow
 #bazel build -c opt --config=cuda //tensorflow/tools/pip_package:build_pip_package
 #bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
 #sudo pip install /tmp/tensorflow_pkg/tensorflow-0.11.0rc2-py2-none-any.whl
-#ln -s ../scripts
+#ln -s ../scripts/protoc-recursively.bash
+#source ./protoc-recursively.bash
+
+bazel build -c opt --config=cuda //tensorflow:libtensorflow.so
+ln -s ${BASEDIR}/Tensorflow/bazel-bin/tensorflow/libtensorflow.so ${INSTALLDIR}/lib
+
+cd ${BASEDIR}
