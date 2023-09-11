@@ -39,4 +39,25 @@ export PATH="${PATH}:${INSTALLDIR}/bin"
 #./configure
 #bazel build -c opt //tensorflow/tools/pip_package:build_pip_package
 #bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
-#sudo pip 
+#sudo pip install --upgrade /tmp/tensorflow_pkg/tensorflow-0.8.0-py2-none-any.whl
+#mkdir ${BASEDIR}/Tensorflow/tensorflow/libtensorflow
+#echo 'cc_binary(
+#     name = "libtensorflow.so",
+#     linkshared = 1,
+#     deps = [
+#         "//tensorflow/core:tensorflow",
+#     ]
+# )' > ${BASEDIR}/Tensorflow/tensorflow/libtensorflow/BUILD
+#cd ${BASEDIR}/Tensorflow/tensorflow/libtensorflow
+#bazel build :libtensorflow.so
+#cd ${BASEDIR}
+#ln -s ${BASEDIR}/Tensorflow/bazel-bin/tensorflow/libtensorflow/libtensorflow.so ${INSTALLDIR}/lib
+
+#echo "installing Quadrocopter Simulator"
+#BUILDDIR=${BUILDDIR}/build-simulator
+#mkdir ${BUILDDIR}
+#cd ${BUILDDIR}
+#cmake -DCMAKE_INSTALL_PREFIX=${INSTALLDIR} -DTF_GRAPH_DIR=${BASEDIR}/TensorflowGraph/models/graph.pb ${BASEDIR}
+#make
+#make install
+#cd ${BASEDIR}
